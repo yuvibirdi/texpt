@@ -1,0 +1,85 @@
+{
+  "name": "latex-presentation-editor",
+  "version": "1.0.0",
+  "description": "A presentation editor that combines visual editing with LaTeX rendering",
+  "main": "build/electron/main.js",
+  "homepage": "./",
+  "private": true,
+  "scripts": {
+    "electron": "electron .",
+    "electron-dev": "ELECTRON_IS_DEV=true electron .",
+    "build": "npm run build-react && npm run build-electron",
+    "build-react": "react-scripts build",
+    "build-electron": "tsc -p electron/tsconfig.json",
+    "start": "npm run build && npm run electron",
+    "dev": "concurrently \"npm run start-react\" \"wait-on http://localhost:3000 && npm run electron-dev\"",
+    "start-react": "react-scripts start",
+    "test": "react-scripts test --watchAll=false",
+    "test:watch": "react-scripts test",
+    "eject": "react-scripts eject",
+    "dist": "npm run build && electron-builder",
+    "dist:dir": "npm run build && electron-builder --dir",
+    "verify": "node scripts/verify-setup.js"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.9.7",
+    "electron-is-dev": "^2.0.0",
+    "fabric": "^5.3.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-redux": "^8.1.3"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.1.4",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.5.1",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.8.0",
+    "@types/react": "^18.2.25",
+    "@types/react-dom": "^18.2.11",
+    "concurrently": "^8.2.2",
+    "electron": "^26.2.4",
+    "electron-builder": "^24.6.4",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.9.5",
+    "wait-on": "^7.0.1"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "build": {
+    "appId": "com.latex-presentation-editor.app",
+    "productName": "LaTeX Presentation Editor",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}
