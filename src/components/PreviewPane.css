@@ -1,0 +1,309 @@
+.preview-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #f8f9fa;
+  border-left: 1px solid #e9ecef;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #fff;
+  border-bottom: 1px solid #e9ecef;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.preview-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #343a40;
+}
+
+.preview-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.refresh-btn,
+.download-btn,
+.retry-btn {
+  padding: 6px 12px;
+  border: 1px solid #dee2e6;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.refresh-btn:hover,
+.download-btn:hover,
+.retry-btn:hover {
+  background: #f8f9fa;
+  border-color: #adb5bd;
+}
+
+.refresh-btn:disabled,
+.download-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.compilation-status {
+  padding: 12px 16px;
+  background: #fff;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.compilation-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: #e9ecef;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #007bff, #0056b3);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: #6c757d;
+  text-align: center;
+}
+
+.compilation-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  color: #721c24;
+}
+
+.error-icon {
+  font-size: 16px;
+}
+
+.error-message {
+  font-size: 12px;
+  flex: 1;
+}
+
+.compilation-success {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+  color: #155724;
+}
+
+.success-icon {
+  font-size: 16px;
+}
+
+.success-message {
+  font-size: 12px;
+}
+
+.preview-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pdf-viewer {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
+.preview-placeholder {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 32px;
+  text-align: center;
+}
+
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e9ecef;
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-spinner p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.error-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.error-icon-large {
+  font-size: 48px;
+  opacity: 0.5;
+}
+
+.error-placeholder p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 16px;
+}
+
+.retry-btn {
+  padding: 8px 16px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.retry-btn:hover {
+  background: #0056b3;
+}
+
+.empty-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.preview-icon {
+  font-size: 48px;
+  opacity: 0.3;
+}
+
+.empty-placeholder p {
+  margin: 0;
+  color: #6c757d;
+}
+
+.empty-placeholder p:first-of-type {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.placeholder-hint {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .preview-header {
+    padding: 8px 12px;
+  }
+  
+  .preview-header h3 {
+    font-size: 14px;
+  }
+  
+  .compilation-status {
+    padding: 8px 12px;
+  }
+  
+  .preview-placeholder {
+    padding: 24px 16px;
+  }
+  
+  .preview-icon,
+  .error-icon-large {
+    font-size: 36px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .preview-pane {
+    background: #1a1a1a;
+    border-left-color: #333;
+  }
+  
+  .preview-header,
+  .compilation-status {
+    background: #2d2d2d;
+    border-bottom-color: #333;
+  }
+  
+  .preview-header h3 {
+    color: #e9ecef;
+  }
+  
+  .refresh-btn,
+  .download-btn,
+  .retry-btn {
+    background: #2d2d2d;
+    border-color: #495057;
+    color: #e9ecef;
+  }
+  
+  .refresh-btn:hover,
+  .download-btn:hover,
+  .retry-btn:hover {
+    background: #3d3d3d;
+    border-color: #6c757d;
+  }
+  
+  .progress-bar {
+    background: #495057;
+  }
+  
+  .progress-text,
+  .loading-spinner p,
+  .error-placeholder p,
+  .empty-placeholder p {
+    color: #adb5bd;
+  }
+  
+  .pdf-viewer {
+    background: #2d2d2d;
+  }
+}

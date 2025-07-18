@@ -1,25 +1,75 @@
 .App {
-  text-align: center;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
 }
 
-.App-header {
-  background-color: #282c34;
-  padding: 20px;
-  color: white;
-  min-height: 100vh;
+.main-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+.app-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+.presentation-info {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.editor-area {
+  flex: 1;
+  display: flex;
+  background-color: #fafafa;
+  overflow: hidden;
+}
+
+.editor-content {
+  flex: 1;
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  overflow: hidden;
 }
 
-.App-header h1 {
-  margin: 0 0 20px 0;
+.slide-editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
-.App-header p {
-  font-size: 18px;
+.preview-panel {
+  width: 400px;
+  min-width: 300px;
   max-width: 600px;
-  line-height: 1.5;
+  resize: horizontal;
+  overflow: auto;
+}
+
+.no-slide-selected {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  font-size: 18px;
 }

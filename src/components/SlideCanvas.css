@@ -1,0 +1,336 @@
+.slide-canvas-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #f5f5f5;
+}
+
+.canvas-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.toolbar-button {
+  padding: 8px 16px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.toolbar-button:hover {
+  background-color: #2563eb;
+}
+
+.toolbar-button:active {
+  background-color: #1d4ed8;
+}
+
+.draggable-button {
+  cursor: grab;
+  position: relative;
+}
+
+.draggable-button:active {
+  cursor: grabbing;
+}
+
+.draggable-button.dragging {
+  opacity: 0.7;
+  transform: scale(0.95);
+}
+
+.draggable-button::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  border: 2px solid white;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.draggable-button:hover::after {
+  opacity: 1;
+}
+
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  padding: 4px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e5e5e5;
+}
+
+.zoom-button {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  color: #374151;
+  transition: background-color 0.2s;
+}
+
+.zoom-button:hover {
+  background-color: #e5e7eb;
+}
+
+.zoom-level {
+  min-width: 50px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.canvas-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+.slide-canvas {
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  cursor: default;
+}
+
+.slide-canvas:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.canvas-info {
+  padding: 8px 16px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e5e5e5;
+  font-size: 12px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.slide-canvas-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #ef4444;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .canvas-toolbar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .zoom-controls {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+  
+  .canvas-wrapper {
+    padding: 10px;
+  }
+  
+  .toolbar-button {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+/* Drag and drop enhancements */
+.toolbar-separator {
+  width: 1px;
+  height: 24px;
+  background-color: #e5e5e5;
+  margin: 0 8px;
+}
+
+.z-index-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e5e5e5;
+}
+
+.z-index-controls .toolbar-button {
+  width: 32px;
+  height: 32px;
+  padding: 4px;
+  font-size: 12px;
+  min-width: unset;
+}
+
+.z-index-controls .toolbar-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f8f9fa;
+}
+
+.z-index-controls .toolbar-button:disabled:hover {
+  background-color: #f8f9fa;
+}
+
+/* Enhanced draggable button styles */
+.draggable-button {
+  position: relative;
+  cursor: grab;
+  transition: all 0.2s ease-in-out;
+}
+
+.draggable-button:active {
+  cursor: grabbing;
+}
+
+.draggable-button.dragging {
+  opacity: 0.7;
+  transform: scale(0.95);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.draggable-button::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  border: 2px solid white;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.draggable-button:hover::after {
+  opacity: 1;
+}
+
+/* Drag preview styles */
+.drag-preview {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.7;
+  transform: scale(0.8);
+  border: 2px dashed #3b82f6;
+  border-radius: 4px;
+  background-color: rgba(59, 130, 246, 0.1);
+  padding: 8px;
+}
+
+.drag-preview .type-indicator {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  font-size: 10px;
+  font-weight: bold;
+  color: #3b82f6;
+  background-color: white;
+  padding: 2px 6px;
+  border-radius: 2px;
+  border: 1px solid #3b82f6;
+}
+
+/* Snap guide lines */
+.snap-guide-line {
+  stroke: #3b82f6;
+  stroke-width: 1;
+  stroke-dasharray: 5,5;
+  opacity: 0.8;
+}
+
+/* Drop zone highlighting */
+.canvas-wrapper.drag-over {
+  background-color: rgba(59, 130, 246, 0.05);
+  border: 2px dashed #3b82f6;
+}
+
+.canvas-wrapper.drag-over .slide-canvas {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Grid overlay for snap-to-grid */
+.canvas-grid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  opacity: 0.1;
+  background-image: 
+    linear-gradient(to right, #000 1px, transparent 1px),
+    linear-gradient(to bottom, #000 1px, transparent 1px);
+  background-size: 10px 10px;
+}
+
+/* Enhanced selection indicators */
+.fabric-object-selected {
+  border: 2px solid #3b82f6 !important;
+  border-radius: 2px;
+}
+
+.fabric-object-selected .fabric-corner {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+}
+
+/* Animation for smooth interactions */
+.slide-canvas-container * {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Custom scrollbar for canvas wrapper if needed */
+.canvas-wrapper::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.canvas-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.canvas-wrapper::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.canvas-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

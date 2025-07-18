@@ -1,8 +1,11 @@
-import { app, BrowserWindow, Menu } from 'electron';
+import { app, BrowserWindow, Menu, ipcMain, dialog } from 'electron';
 import * as path from 'path';
+import * as fs from 'fs';
 import isDev from 'electron-is-dev';
+import { LaTeXCompiler } from '../src/services/latexCompiler';
 
 let mainWindow: BrowserWindow;
+let latexCompiler: LaTeXCompiler;
 
 function createWindow(): void {
   // Create the browser window
@@ -14,10 +17,12 @@ function createWindow(): void {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
+      webSecurity: !isDev // Disable web security in development for easier testing
     },
     titleBarStyle: 'default',
-    show: false
+    show: false,
+    icon: isDev ? undefined : path.join(__dirname, '../build/icon.png') // App icon for production
   });
 
   // Load the app
@@ -35,6 +40,16 @@ function createWindow(): void {
   // Open DevTools in development
   if (isDev) {
     mainWindow.webContents.openDevTools();
+    
+    // Enable hot reload for development (optional - requires electron-reload package)
+    try {
+      require('electron-reload')(__dirname, {
+        electron: path.join(__dirname, '..', 'node_modules', '.bin', 'electron'),
+        hardResetMethod: 'exit'
+      });
+    } catch (error) {
+      console.log('electron-reload not available - hot reload disabled');
+    }
   }
 
   // Handle window closed
@@ -45,8 +60,13 @@ function createWindow(): void {
 
 // This method will be called when Electron has finished initialization
 app.whenReady().then(() => {
+  // Initialize LaTeX compiler
+  latexCompiler = new LaTeXCompiler();
+  setupLatexCompilerEvents();
+
   createWindow();
   createMenu();
+  setupIpcHandlers();
 
   app.on('activate', () => {
     // On macOS, re-create window when dock icon is clicked
@@ -64,6 +84,34 @@ app.on('window-all-closed', () => {
   }
 });
 
+// Cleanup on app quit
+app.on('before-quit', async () => {
+  if (latexCompiler) {
+    await latexCompiler.cleanup();
+  }
+});
+
+function setupLatexCompilerEvents(): void {
+  // Forward LaTeX compiler events to renderer process
+  latexCompiler.on('progress', (progress) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('latex:progress', progress);
+    }
+  });
+
+  latexCompiler.on('job-completed', (result) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('latex:job-completed', result);
+    }
+  });
+
+  latexCompiler.on('job-cancelled', (data) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('latex:job-cancelled', data);
+    }
+  });
+}
+
 function createMenu(): void {
   const template: Electron.MenuItemConstructorOptions[] = [
     {
@@ -73,28 +121,28 @@ function createMenu(): void {
           label: 'New Presentation',
           accelerator: 'CmdOrCtrl+N',
           click: () => {
-            // TODO: Implement new presentation
+            mainWindow.webContents.send('menu-action', 'new-presentation');
           }
         },
         {
           label: 'Open...',
           accelerator: 'CmdOrCtrl+O',
           click: () => {
-            // TODO: Implement open presentation
+            mainWindow.webContents.send('menu-action', 'open-presentation');
           }
         },
         {
           label: 'Save',
           accelerator: 'CmdOrCtrl+S',
           click: () => {
-            // TODO: Implement save presentation
+            mainWindow.webContents.send('menu-action', 'save-presentation');
           }
         },
         {
           label: 'Save As...',
           accelerator: 'CmdOrCtrl+Shift+S',
           click: () => {
-            // TODO: Implement save as
+            mainWindow.webContents.send('menu-action', 'save-presentation-as');
           }
         },
         { type: 'separator' },
@@ -102,7 +150,7 @@ function createMenu(): void {
           label: 'Export PDF',
           accelerator: 'CmdOrCtrl+E',
           click: () => {
-            // TODO: Implement PDF export
+            mainWindow.webContents.send('menu-action', 'export-pdf');
           }
         },
         { type: 'separator' },
@@ -193,6 +241,47 @@ function createMenu(): void {
           role: 'togglefullscreen'
         }
       ]
+    },
+    {
+      label: 'Slide',
+      submenu: [
+        {
+          label: 'New Slide',
+          accelerator: 'CmdOrCtrl+Shift+N',
+          click: () => {
+            mainWindow.webContents.send('menu-action', 'new-slide');
+          }
+        },
+        {
+          label: 'Duplicate Slide',
+          accelerator: 'CmdOrCtrl+D',
+          click: () => {
+            mainWindow.webContents.send('menu-action', 'duplicate-slide');
+          }
+        },
+        {
+          label: 'Delete Slide',
+          accelerator: 'Delete',
+          click: () => {
+            mainWindow.webContents.send('menu-action', 'delete-slide');
+          }
+        },
+        { type: 'separator' },
+        {
+          label: 'Previous Slide',
+          accelerator: 'CmdOrCtrl+Left',
+          click: () => {
+            mainWindow.webContents.send('menu-action', 'previous-slide');
+          }
+        },
+        {
+          label: 'Next Slide',
+          accelerator: 'CmdOrCtrl+Right',
+          click: () => {
+            mainWindow.webContents.send('menu-action', 'next-slide');
+          }
+        }
+      ]
     }
   ];
 
@@ -240,4 +329,174 @@ function createMenu(): void {
 
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
+}
+
+function setupIpcHandlers(): void {
+  // File dialog handlers
+  ipcMain.handle('dialog:openFile', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      properties: ['openFile'],
+      filters: [
+        { name: 'Presentation Files', extensions: ['lpe', 'json'] },
+        { name: 'PowerPoint Files', extensions: ['pptx', 'ppt'] },
+        { name: 'All Files', extensions: ['*'] }
+      ]
+    });
+
+    if (!result.canceled && result.filePaths.length > 0) {
+      try {
+        const filePath = result.filePaths[0];
+        const fileContent = fs.readFileSync(filePath, 'utf-8');
+        return {
+          success: true,
+          filePath,
+          content: fileContent
+        };
+      } catch (error) {
+        return {
+          success: false,
+          error: `Failed to read file: ${error}`
+        };
+      }
+    }
+
+    return { success: false, canceled: true };
+  });
+
+  ipcMain.handle('dialog:saveFile', async (_event, data) => {
+    const result = await dialog.showSaveDialog(mainWindow, {
+      filters: [
+        { name: 'Presentation Files', extensions: ['lpe'] },
+        { name: 'JSON Files', extensions: ['json'] },
+        { name: 'All Files', extensions: ['*'] }
+      ],
+      defaultPath: 'presentation.lpe'
+    });
+
+    if (!result.canceled && result.filePath) {
+      try {
+        const content = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+        fs.writeFileSync(result.filePath, content, 'utf-8');
+        return {
+          success: true,
+          filePath: result.filePath
+        };
+      } catch (error) {
+        return {
+          success: false,
+          error: `Failed to save file: ${error}`
+        };
+      }
+    }
+
+    return { success: false, canceled: true };
+  });
+
+  // LaTeX compilation handlers
+  ipcMain.handle('latex:compile', async (_event, source: string, options: any = {}) => {
+    try {
+      const jobId = await latexCompiler.compile(source, options);
+      return { success: true, jobId };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  });
+
+  ipcMain.handle('latex:cancel', async (_event, jobId: string) => {
+    try {
+      const cancelled = latexCompiler.cancelJob(jobId);
+      return { success: true, cancelled };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  });
+
+  ipcMain.handle('latex:getQueueStatus', async () => {
+    try {
+      const status = latexCompiler.getQueueStatus();
+      return { success: true, status };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  });
+
+  ipcMain.handle('latex:clearQueue', async () => {
+    try {
+      latexCompiler.clearQueue();
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  });
+
+  ipcMain.handle('latex:checkAvailability', async () => {
+    try {
+      const availability = await latexCompiler.checkLatexAvailability();
+      return { success: true, ...availability };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  });
+
+  // Window management handlers
+  ipcMain.handle('window:minimize', () => {
+    if (mainWindow) {
+      mainWindow.minimize();
+    }
+  });
+
+  ipcMain.handle('window:maximize', () => {
+    if (mainWindow) {
+      if (mainWindow.isMaximized()) {
+        mainWindow.unmaximize();
+      } else {
+        mainWindow.maximize();
+      }
+    }
+  });
+
+  ipcMain.handle('window:close', () => {
+    if (mainWindow) {
+      mainWindow.close();
+    }
+  });
+
+  ipcMain.handle('window:isMaximized', () => {
+    return mainWindow ? mainWindow.isMaximized() : false;
+  });
+
+  // Application info handlers
+  ipcMain.handle('app:getVersion', () => {
+    return app.getVersion();
+  });
+
+  ipcMain.handle('app:getName', () => {
+    return app.getName();
+  });
+
+  ipcMain.handle('app:getPlatform', () => {
+    return process.platform;
+  });
+
+  // Error reporting handler
+  ipcMain.handle('app:reportError', async (_event, error: any) => {
+    console.error('Renderer process error:', error);
+    // TODO: Implement error reporting/logging
+    return { success: true };
+  });
 }
