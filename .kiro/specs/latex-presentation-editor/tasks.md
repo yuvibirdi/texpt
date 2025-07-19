@@ -105,14 +105,14 @@
   - Add automatic list formatting and LaTeX list generation
   - _Requirements: 4.5_
 
-- [-] 16. Build file operations and persistence system
+- [x] 16. Build file operations and persistence system
   - Implement presentation save/load functionality with custom file format
   - Add auto-save functionality with configurable intervals
   - Create file format validation and error recovery
   - Implement recent files management and quick access
   - _Requirements: 9.1, 9.2, 9.4_
 
-- [ ] 17. Add export functionality for multiple formats
+- [x] 17. Add export functionality for multiple formats
   - Implement PDF export with high-quality LaTeX compilation
   - Create LaTeX source code export with clean formatting
   - Add PowerPoint (PPTX) export capability using conversion libraries

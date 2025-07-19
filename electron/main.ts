@@ -493,6 +493,118 @@ function setupIpcHandlers(): void {
     return process.platform;
   });
 
+  // Export handlers
+  ipcMain.handle('export:saveFile', async (_event, data: string, options: any = {}) => {
+    const filters = [];
+    
+    // Set up file filters based on export format
+    switch (options.format) {
+      case 'pdf':
+        filters.push({ name: 'PDF Files', extensions: ['pdf'] });
+        break;
+      case 'latex':
+        filters.push({ name: 'LaTeX Files', extensions: ['tex'] });
+        break;
+      case 'html':
+        filters.push({ name: 'HTML Files', extensions: ['html'] });
+        break;
+      case 'markdown':
+        filters.push({ name: 'Markdown Files', extensions: ['md'] });
+        break;
+      case 'json':
+        filters.push({ name: 'JSON Files', extensions: ['json'] });
+        break;
+      case 'pptx':
+        filters.push({ name: 'PowerPoint Files', extensions: ['pptx'] });
+        break;
+      default:
+        filters.push({ name: 'All Files', extensions: ['*'] });
+    }
+    
+    filters.push({ name: 'All Files', extensions: ['*'] });
+
+    const result = await dialog.showSaveDialog(mainWindow, {
+      filters,
+      defaultPath: options.defaultFileName || `presentation.${options.format || 'txt'}`
+    });
+
+    if (!result.canceled && result.filePath) {
+      try {
+        const content = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+        fs.writeFileSync(result.filePath, content, 'utf-8');
+        
+        // Get file stats for metadata
+        const stats = fs.statSync(result.filePath);
+        
+        return {
+          success: true,
+          filePath: result.filePath,
+          fileSize: stats.size
+        };
+      } catch (error) {
+        return {
+          success: false,
+          error: `Failed to save file: ${error}`
+        };
+      }
+    }
+
+    return { success: false, canceled: true };
+  });
+
+  ipcMain.handle('export:writeFile', async (_event, filePath: string, content: string) => {
+    try {
+      fs.writeFileSync(filePath, content, 'utf-8');
+      const stats = fs.statSync(filePath);
+      
+      return {
+        success: true,
+        filePath,
+        fileSize: stats.size
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: `Failed to write file: ${error}`
+      };
+    }
+  });
+
+  ipcMain.handle('export:writeFileBuffer', async (_event, filePath: string, buffer: Buffer) => {
+    try {
+      fs.writeFileSync(filePath, buffer);
+      const stats = fs.statSync(filePath);
+      
+      return {
+        success: true,
+        filePath,
+        fileSize: stats.size
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: `Failed to write file buffer: ${error}`
+      };
+    }
+  });
+
+  ipcMain.handle('export:getFileStats', async (_event, filePath: string) => {
+    try {
+      const stats = fs.statSync(filePath);
+      return {
+        success: true,
+        size: stats.size,
+        created: stats.birthtime,
+        modified: stats.mtime
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: `Failed to get file stats: ${error}`
+      };
+    }
+  });
+
   // Error reporting handler
   ipcMain.handle('app:reportError', async (_event, error: any) => {
     console.error('Renderer process error:', error);

@@ -16,6 +16,27 @@ export interface ElectronAPI {
     error?: string;
     canceled?: boolean;
   }>;
+
+  // Export operations
+  exportWriteFile: (filePath: string, content: string) => Promise<{
+    success: boolean;
+    error?: string;
+  }>;
+
+  exportWriteFileBuffer: (filePath: string, buffer: Buffer) => Promise<{
+    success: boolean;
+    error?: string;
+  }>;
+
+  exportSaveFile: (content: string, options: {
+    format: string;
+    defaultFileName?: string;
+  }) => Promise<{
+    success: boolean;
+    filePath?: string;
+    error?: string;
+    canceled?: boolean;
+  }>;
   
   // LaTeX compilation
   compileLatex: (source: string, options?: any) => Promise<{

@@ -25,6 +25,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getAppName: () => ipcRenderer.invoke('app:getName'),
   getPlatform: () => ipcRenderer.invoke('app:getPlatform'),
   
+  // Export operations
+  exportSaveFile: (data: string, options?: any) => ipcRenderer.invoke('export:saveFile', data, options),
+  exportWriteFile: (filePath: string, content: string) => ipcRenderer.invoke('export:writeFile', filePath, content),
+  exportWriteFileBuffer: (filePath: string, buffer: Buffer) => ipcRenderer.invoke('export:writeFileBuffer', filePath, buffer),
+  exportGetFileStats: (filePath: string) => ipcRenderer.invoke('export:getFileStats', filePath),
+  
   // Error reporting
   reportError: (error: any) => ipcRenderer.invoke('app:reportError', error),
   
