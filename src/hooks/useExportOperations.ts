@@ -66,7 +66,6 @@ export const useExportOperations = (): UseExportOperationsReturn => {
   ): Promise<boolean> => {
     if (!presentation) {
       dispatch(addNotification({
-        id: `export-error-${Date.now()}`,
         type: 'error',
         title: 'Export Error',
         message: 'No presentation to export',
@@ -81,7 +80,6 @@ export const useExportOperations = (): UseExportOperationsReturn => {
     
     if (!formatInfo) {
       dispatch(addNotification({
-        id: `export-error-${Date.now()}`,
         type: 'error',
         title: 'Export Error',
         message: `Unsupported export format: ${format}`,
@@ -106,7 +104,6 @@ export const useExportOperations = (): UseExportOperationsReturn => {
     const validation = exportService.validateExportOptions(exportOptions);
     if (!validation.valid) {
       dispatch(addNotification({
-        id: `export-error-${Date.now()}`,
         type: 'error',
         title: 'Export Error',
         message: `Invalid export options: ${validation.errors.join(', ')}`,
@@ -126,7 +123,6 @@ export const useExportOperations = (): UseExportOperationsReturn => {
       
       if (result.success) {
         dispatch(addNotification({
-          id: `export-success-${Date.now()}`,
           type: 'success',
           title: 'Export Successful',
           message: `${formatInfo.name} export completed successfully${result.outputPath ? ` at ${result.outputPath}` : ''}`,
@@ -139,7 +135,6 @@ export const useExportOperations = (): UseExportOperationsReturn => {
           const fileSizeKB = Math.round(fileSize / 1024);
           
           dispatch(addNotification({
-            id: `export-info-${Date.now()}`,
             type: 'info',
             title: 'Export Details',
             message: `Exported ${slideCount} slides to ${resultFormat.toUpperCase()} (${fileSizeKB} KB)`,
@@ -151,7 +146,6 @@ export const useExportOperations = (): UseExportOperationsReturn => {
       } else {
         // Handle export failure
         dispatch(addNotification({
-          id: `export-error-${Date.now()}`,
           type: 'error',
           title: 'Export Failed',
           message: result.error || 'Unknown error occurred during export',
@@ -162,7 +156,6 @@ export const useExportOperations = (): UseExportOperationsReturn => {
         if (result.warnings && result.warnings.length > 0) {
           result.warnings.forEach((warning, index) => {
             dispatch(addNotification({
-              id: `export-warning-${Date.now()}-${index}`,
               type: 'warning',
               title: 'Export Warning',
               message: warning,
@@ -175,7 +168,6 @@ export const useExportOperations = (): UseExportOperationsReturn => {
       }
     } catch (error) {
       dispatch(addNotification({
-        id: `export-error-${Date.now()}`,
         type: 'error',
         title: 'Export Failed',
         message: error instanceof Error ? error.message : 'Unknown error occurred',

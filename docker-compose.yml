@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  latex-editor:
+    build: .
+    container_name: latex-presentation-editor
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount a volume for persistent data (presentations, exports)
+      - ./data:/app/data
+      # Mount source code for development (optional)
+      - ./src:/app/src:ro
+    environment:
+      - NODE_ENV=production
+      - DISPLAY=:99
+    # Enable GUI applications in container
+    security_opt:
+      - seccomp:unconfined
+    # Allocate a TTY for better logging
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+
+  # Development version with hot reload
+  latex-editor-dev:
+    build:
+      context: .
+      target: development
+    container_name: latex-presentation-editor-dev
+    ports:
+      - "3000:3000"
+      - "3001:3001"  # For Electron dev tools
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - DISPLAY=:99
+      - ELECTRON_IS_DEV=true
+    command: ["/app/start.sh", "npm", "run", "dev"]
+    profiles:
+      - dev

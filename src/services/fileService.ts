@@ -41,6 +41,7 @@ export class FileService {
   private currentFilePath: string | null = null;
   private isModified: boolean = false;
   private onAutoSaveCallback?: (presentation: Presentation) => void;
+  private getCurrentPresentationCallback?: () => Presentation;
   private onErrorCallback?: (error: string) => void;
 
   private constructor() {
@@ -69,8 +70,8 @@ export class FileService {
     // Restart auto-save timer if interval changed
     if (config.autoSaveInterval !== undefined && this.autoSaveTimer) {
       this.stopAutoSave();
-      if (this.config.autoSaveEnabled && this.onAutoSaveCallback) {
-        this.startAutoSave(this.onAutoSaveCallback);
+      if (this.config.autoSaveEnabled && this.getCurrentPresentationCallback) {
+        this.startAutoSave(this.getCurrentPresentationCallback);
       }
     }
   }
@@ -246,10 +247,10 @@ export class FileService {
   public startAutoSave(getCurrentPresentation: () => Presentation): void {
     if (!this.config.autoSaveEnabled) return;
 
-    this.onAutoSaveCallback = getCurrentPresentation;
+    this.getCurrentPresentationCallback = getCurrentPresentation;
     this.autoSaveTimer = setInterval(async () => {
-      if (this.isModified && this.currentFilePath && this.onAutoSaveCallback) {
-        const presentation = this.onAutoSaveCallback();
+      if (this.isModified && this.currentFilePath && this.getCurrentPresentationCallback) {
+        const presentation = this.getCurrentPresentationCallback();
         await this.autoSave(presentation);
       }
     }, this.config.autoSaveInterval * 1000);

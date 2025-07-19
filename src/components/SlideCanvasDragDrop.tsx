@@ -78,7 +78,7 @@ export const SlideCanvasDragDrop: React.FC<SlideCanvasDragDropProps> = ({
     if (!fabricCanvasRef.current || !canvasRef.current) return;
     
     const dragState = dragDropService.getDragState();
-    const dropPosition = dragDropService.getDropPosition(e, canvasRef.current);
+    const dropPosition = dragDropService.getDropPosition(e.nativeEvent, canvasRef.current);
     
     // Handle different drop types
     if (dragState.dragType === 'toolbar') {

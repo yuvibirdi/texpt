@@ -126,6 +126,8 @@ export interface SlideLayout {
   regions: {
     title?: { x: number; y: number; width: number; height: number };
     content?: { x: number; y: number; width: number; height: number };
+    leftColumn?: { x: number; y: number; width: number; height: number };
+    rightColumn?: { x: number; y: number; width: number; height: number };
     footer?: { x: number; y: number; width: number; height: number };
   };
 }

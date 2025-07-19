@@ -28,6 +28,11 @@ export interface ExportResult {
     duration: number;
     format: string;
     slideCount: number;
+    quality?: 'low' | 'medium' | 'high';
+    compiler?: 'pdflatex' | 'xelatex' | 'lualatex';
+    passes?: number;
+    cleanFormatting?: boolean;
+    linesOfCode?: number;
   };
 }
 
@@ -1678,7 +1683,7 @@ export class ExportService {
   /**
    * Select optimal LaTeX compiler based on quality setting
    */
-  private selectOptimalCompiler(quality: 'low' | 'medium' | 'high'): string {
+  private selectOptimalCompiler(quality: 'low' | 'medium' | 'high'): 'pdflatex' | 'xelatex' | 'lualatex' {
     switch (quality) {
       case 'high':
         return 'xelatex'; // Best for fonts and Unicode support

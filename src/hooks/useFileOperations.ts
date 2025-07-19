@@ -84,7 +84,6 @@ export const useFileOperations = (): UseFileOperationsReturn => {
       // Error callback
       (error: string) => {
         dispatch(addNotification({
-          id: `file-error-${Date.now()}`,
           type: 'error',
           title: 'File Operation Error',
           message: error,
@@ -115,7 +114,6 @@ export const useFileOperations = (): UseFileOperationsReturn => {
   const savePresentation = useCallback(async (showDialog: boolean = false): Promise<boolean> => {
     if (!presentation) {
       dispatch(addNotification({
-        id: `save-error-${Date.now()}`,
         type: 'error',
         title: 'Save Error',
         message: 'No presentation to save',
@@ -136,7 +134,6 @@ export const useFileOperations = (): UseFileOperationsReturn => {
       if (result.success) {
         dispatch(markAsSaved());
         dispatch(addNotification({
-          id: `save-success-${Date.now()}`,
           type: 'success',
           title: 'Saved',
           message: `Presentation saved successfully`,
@@ -151,7 +148,6 @@ export const useFileOperations = (): UseFileOperationsReturn => {
         return true;
       } else if (!result.canceled) {
         dispatch(addNotification({
-          id: `save-error-${Date.now()}`,
           type: 'error',
           title: 'Save Failed',
           message: result.error || 'Unknown error occurred',
@@ -162,7 +158,6 @@ export const useFileOperations = (): UseFileOperationsReturn => {
       return false;
     } catch (error) {
       dispatch(addNotification({
-        id: `save-error-${Date.now()}`,
         type: 'error',
         title: 'Save Failed',
         message: error instanceof Error ? error.message : 'Unknown error occurred',
@@ -185,7 +180,6 @@ export const useFileOperations = (): UseFileOperationsReturn => {
       if (result.success && result.presentation) {
         dispatch(loadPresentation(result.presentation));
         dispatch(addNotification({
-          id: `load-success-${Date.now()}`,
           type: 'success',
           title: 'Loaded',
           message: `Presentation "${result.presentation.title}" loaded successfully`,
@@ -195,7 +189,6 @@ export const useFileOperations = (): UseFileOperationsReturn => {
         return true;
       } else if (!result.canceled) {
         dispatch(addNotification({
-          id: `load-error-${Date.now()}`,
           type: 'error',
           title: 'Load Failed',
           message: result.error || 'Unknown error occurred',
@@ -206,7 +199,6 @@ export const useFileOperations = (): UseFileOperationsReturn => {
       return false;
     } catch (error) {
       dispatch(addNotification({
-        id: `load-error-${Date.now()}`,
         type: 'error',
         title: 'Load Failed',
         message: error instanceof Error ? error.message : 'Unknown error occurred',
@@ -235,7 +227,6 @@ export const useFileOperations = (): UseFileOperationsReturn => {
     fileService.markAsSaved();
     
     dispatch(addNotification({
-      id: `new-presentation-${Date.now()}`,
       type: 'success',
       title: 'New Presentation',
       message: 'New presentation created',

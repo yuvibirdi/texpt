@@ -8,7 +8,7 @@ import {
   addCustomTheme,
   deleteCustomTheme,
 } from '../store/slices/themeSlice';
-import { updatePresentationSettings } from '../store/slices/presentationSlice';
+import { applyTheme } from '../store/slices/presentationSlice';
 import { Theme, Color } from '../types/presentation';
 import './ThemeGallery.css';
 
@@ -53,7 +53,7 @@ const ThemeGallery: React.FC<ThemeGalleryProps> = ({ onThemeSelect }) => {
   const handleThemeSelect = (theme: Theme) => {
     if (currentPresentation) {
       // Update the current presentation's theme
-      dispatch(updatePresentationSettings({ theme }));
+      dispatch(applyTheme(theme));
       dispatch(selectTheme(theme.id));
       
       if (onThemeSelect) {

@@ -225,11 +225,15 @@ export class DragDropService {
         });
       }
 
-      this.canvas.add(line);
+      if (this.canvas) {
+        this.canvas.add(line);
+      }
       this.snapGuideLines.push(line);
     });
 
-    this.canvas.renderAll();
+    if (this.canvas) {
+      this.canvas.renderAll();
+    }
   }
 
   // Hide snap guide lines

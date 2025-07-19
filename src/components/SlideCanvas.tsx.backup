@@ -1102,20 +1102,6 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
     handleToolbarDragStart(e, 'image');
   };
 
-  // Enhanced drag-and-drop handlers
-  const handleToolbarDragStart = useCallback((e: React.DragEvent, elementType: string) => {
-    const target = e.target as HTMLElement;
-    const preview = dragDropService.createDragPreview(target, elementType as any);
-    document.body.appendChild(preview);
-    
-    dragDropService.startDrag('toolbar', { elementType }, preview);
-    
-    e.dataTransfer.setData('text/plain', elementType);
-    e.dataTransfer.effectAllowed = 'copy';
-    
-    setIsDraggingText(elementType === 'text');
-  }, []);
-
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'copy';

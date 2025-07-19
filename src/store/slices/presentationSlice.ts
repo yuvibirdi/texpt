@@ -492,6 +492,7 @@ export const {
   loadPresentation,
   updatePresentationMetadata,
   updatePresentationSettings,
+  applyTheme,
   
   // Slide actions
   addSlide,
