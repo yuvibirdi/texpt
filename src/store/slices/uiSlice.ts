@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AccessibilitySettings, KeyboardMode } from '../../services/accessibilityService';
 
 export interface UIState {
   // Editor state
@@ -47,6 +48,9 @@ export interface UIState {
     duration?: number;
     timestamp: Date;
   }>;
+  
+  // Accessibility settings
+  accessibility: AccessibilitySettings;
 }
 
 const initialState: UIState = {
@@ -81,6 +85,17 @@ const initialState: UIState = {
   
   error: null,
   notifications: [],
+  
+  accessibility: {
+    keyboardMode: 'default',
+    highContrastMode: false,
+    screenReaderSupport: true,
+    reducedMotion: false,
+    focusIndicators: true,
+    keyboardNavigation: true,
+    announceChanges: true,
+    fontSize: 'medium',
+  },
 };
 
 const uiSlice = createSlice({
@@ -248,6 +263,48 @@ const uiSlice = createSlice({
     clearNotifications: (state) => {
       state.notifications = [];
     },
+    
+    // Accessibility settings
+    updateAccessibilitySetting: (state, action: PayloadAction<{ key: keyof AccessibilitySettings; value: any }>) => {
+      const { key, value } = action.payload;
+      (state.accessibility as any)[key] = value;
+    },
+    
+    updateAccessibilitySettings: (state, action: PayloadAction<Partial<AccessibilitySettings>>) => {
+      state.accessibility = { ...state.accessibility, ...action.payload };
+    },
+    
+    setKeyboardMode: (state, action: PayloadAction<KeyboardMode>) => {
+      state.accessibility.keyboardMode = action.payload;
+    },
+    
+    toggleHighContrastMode: (state) => {
+      state.accessibility.highContrastMode = !state.accessibility.highContrastMode;
+    },
+    
+    toggleScreenReaderSupport: (state) => {
+      state.accessibility.screenReaderSupport = !state.accessibility.screenReaderSupport;
+    },
+    
+    toggleReducedMotion: (state) => {
+      state.accessibility.reducedMotion = !state.accessibility.reducedMotion;
+    },
+    
+    toggleFocusIndicators: (state) => {
+      state.accessibility.focusIndicators = !state.accessibility.focusIndicators;
+    },
+    
+    toggleKeyboardNavigation: (state) => {
+      state.accessibility.keyboardNavigation = !state.accessibility.keyboardNavigation;
+    },
+    
+    toggleAnnounceChanges: (state) => {
+      state.accessibility.announceChanges = !state.accessibility.announceChanges;
+    },
+    
+    setFontSize: (state, action: PayloadAction<AccessibilitySettings['fontSize']>) => {
+      state.accessibility.fontSize = action.payload;
+    },
   },
 });
 
@@ -284,6 +341,16 @@ export const {
   addNotification,
   removeNotification,
   clearNotifications,
+  updateAccessibilitySetting,
+  updateAccessibilitySettings,
+  setKeyboardMode,
+  toggleHighContrastMode,
+  toggleScreenReaderSupport,
+  toggleReducedMotion,
+  toggleFocusIndicators,
+  toggleKeyboardNavigation,
+  toggleAnnounceChanges,
+  setFontSize,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

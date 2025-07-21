@@ -19,6 +19,9 @@ import { validateImageFile, convertImageForLatex, getImageInfo, ImageInfo } from
 import { createFabricShape, fabricObjectToSlideElement, ShapeDrawingState } from '../utils/shapeUtils';
 import ShapeToolbar from './ShapeToolbar';
 import { dragDropService, DragDropService } from '../services/dragDropService';
+import { canvasVirtualizationService } from '../services/canvasVirtualizationService';
+import { memoryManagementService } from '../services/memoryManagementService';
+import { useKeyboardShortcuts, useScreenReader } from '../hooks/useAccessibility';
 import './SlideCanvas.css';
 
 interface SlideCanvasProps {
@@ -41,8 +44,13 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
   const [lastPanPoint, setLastPanPoint] = useState<{ x: number; y: number } | null>(null);
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   const [isTextEditing, setIsTextEditing] = useState(false);
+
+  // Add logging for isTextEditing state changes
+  useEffect(() => {
+    console.log('🔄 isTextEditing state changed to:', isTextEditing);
+  }, [isTextEditing]);
   const [selectedElementProperties, setSelectedElementProperties] = useState<ElementProperties>({});
-  const [isDraggingText, setIsDraggingText] = useState(false);
+
   const [showImageImportDialog, setShowImageImportDialog] = useState(false);
   const [shapeDrawingState, setShapeDrawingState] = useState<ShapeDrawingState>({
     isDrawing: false,
@@ -55,9 +63,78 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
   const currentSlide = presentation?.slides.find(slide => slide.id === slideId);
   const { activeTool, activeShapeType } = useSelector((state: RootState) => state.ui);
 
+  // Accessibility hooks
+  const { announceAction, announceSelection, announceError } = useScreenReader();
+
+  // Register keyboard shortcuts for canvas context
+  useKeyboardShortcuts('canvas', [
+    {
+      key: 't',
+      ctrlKey: true,
+      description: 'Add text element',
+      action: () => {
+        addTextElementAtPosition(100, 100);
+        announceAction('Added text element');
+      }
+    },
+    {
+      key: 'Delete',
+      description: 'Delete selected element',
+      action: () => {
+        if (fabricCanvasRef.current) {
+          const activeObject = fabricCanvasRef.current.getActiveObject();
+          if (activeObject && activeObject.data?.elementId) {
+            dispatch(deleteElement({
+              slideId,
+              elementId: activeObject.data.elementId,
+            }));
+            fabricCanvasRef.current.remove(activeObject);
+            announceAction('Deleted selected element');
+          }
+        }
+      }
+    },
+    {
+      key: 'Enter',
+      description: 'Edit selected text element',
+      action: () => {
+        if (fabricCanvasRef.current) {
+          const activeObject = fabricCanvasRef.current.getActiveObject();
+          if (activeObject && activeObject.type === 'textbox') {
+            const textbox = activeObject as fabric.Textbox;
+            textbox.enterEditing();
+            textbox.selectAll();
+            setIsTextEditing(true);
+            announceAction('Entered text editing mode');
+          }
+        }
+      }
+    },
+    {
+      key: 'Escape',
+      description: 'Exit text editing mode',
+      action: () => {
+        if (isTextEditing && fabricCanvasRef.current) {
+          const activeObject = fabricCanvasRef.current.getActiveObject();
+          if (activeObject && activeObject.type === 'textbox') {
+            const textbox = activeObject as fabric.Textbox;
+            textbox.exitEditing();
+            setIsTextEditing(false);
+            announceAction('Exited text editing mode');
+          }
+        }
+      }
+    }
+  ]);
+
   // Add text element at specific position
   const addTextElementAtPosition = useCallback((x: number, y: number, autoEdit: boolean = true) => {
-    if (!fabricCanvasRef.current) return;
+    console.log('🔤 addTextElementAtPosition called:', { x, y, autoEdit, hasCanvas: !!fabricCanvasRef.current });
+    
+    if (!fabricCanvasRef.current) {
+      console.error('❌ No fabric canvas available');
+      return;
+    }
 
     const newElement: Omit<SlideElement, 'id' | 'createdAt' | 'updatedAt'> = {
       type: 'text',
@@ -75,15 +152,22 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
       content: 'Type your text here',
     };
 
+    console.log('📝 Creating new text element:', newElement);
     dispatch(addElement({ slideId, element: newElement }));
 
     // Auto-select and enter editing mode for new text elements
     if (autoEdit) {
+      console.log('⏰ Setting timeout for auto-edit');
       setTimeout(() => {
+        console.log('🎯 Timeout fired, checking for canvas and objects');
         if (fabricCanvasRef.current) {
           const objects = fabricCanvasRef.current.getObjects();
+          console.log('📊 Canvas objects count:', objects.length);
           const newTextObject = objects[objects.length - 1]; // Get the last added object
+          console.log('🎯 New text object:', { type: newTextObject?.type, hasData: !!newTextObject?.data });
+          
           if (newTextObject && newTextObject.type === 'textbox') {
+            console.log('✅ Found textbox, setting as active and entering edit mode');
             fabricCanvasRef.current.setActiveObject(newTextObject);
             const textbox = newTextObject as fabric.Textbox;
             
@@ -95,13 +179,16 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
               cornerSize: 8,
             });
             
+            console.log('🖊️ Entering editing mode');
             textbox.enterEditing();
             textbox.selectAll();
             setIsTextEditing(true);
+            console.log('📝 Text editing state set to true');
             fabricCanvasRef.current.renderAll();
             
             // Remove the special styling after editing
             setTimeout(() => {
+              console.log('🎨 Removing special styling');
               textbox.set({
                 borderColor: 'rgba(178,204,255,1)',
                 borderDashArray: undefined,
@@ -110,23 +197,89 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
               });
               fabricCanvasRef.current?.renderAll();
             }, 2000);
+          } else {
+            console.error('❌ No textbox found or wrong type:', newTextObject?.type);
           }
+        } else {
+          console.error('❌ No fabric canvas in timeout');
         }
       }, 100); // Small delay to ensure the object is rendered
     }
   }, [dispatch, slideId]);
 
+  // Handle files drop
+  const handleFilesDrop = useCallback(async (files: FileList, position: Position) => {
+    const { valid, invalid } = dragDropService.validateDroppedFiles(files);
+    
+    if (invalid.length > 0) {
+      console.warn('Invalid files dropped:', invalid.map(f => f.name));
+    }
+    
+    for (const file of valid) {
+      if (file.type.startsWith('image/')) {
+        try {
+          const imageInfo = await getImageInfo(file);
+          const imageUrl = URL.createObjectURL(file);
+          
+          // Apply snap positioning
+          const snappedResult = dragDropService.findSnapPosition(
+            position,
+            { width: imageInfo.width, height: imageInfo.height },
+            currentSlide?.elements || [],
+            []
+          );
+          
+          const newElement: Omit<SlideElement, 'id' | 'createdAt' | 'updatedAt'> = {
+            type: 'image',
+            position: snappedResult.position,
+            size: { width: imageInfo.width, height: imageInfo.height },
+            properties: {
+              src: imageUrl,
+              alt: file.name,
+              opacity: 1,
+            },
+            content: imageUrl,
+          };
+          
+          dispatch(addElement({ slideId, element: newElement }));
+          
+          // Show snap guides briefly
+          if (snappedResult.guides.length > 0) {
+            dragDropService.showSnapGuides(snappedResult.guides);
+            setTimeout(() => dragDropService.hideSnapGuides(), 1000);
+          }
+        } catch (error) {
+          console.error('Error processing dropped image:', error);
+        }
+      }
+    }
+  }, [dispatch, slideId, currentSlide?.elements]);
+
   // Handle keyboard events
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    if (!fabricCanvasRef.current) return;
+    console.log('⌨️ KEYDOWN EVENT:', { 
+      key: event.key, 
+      isTextEditing, 
+      hasCanvas: !!fabricCanvasRef.current,
+      target: (event.target as HTMLElement)?.tagName,
+      activeElement: document.activeElement?.tagName
+    });
+    
+    if (!fabricCanvasRef.current) {
+      console.log('❌ No fabric canvas, ignoring keydown');
+      return;
+    }
     
     // Don't handle keyboard events when in text editing mode
-    if (isTextEditing) return;
+    if (isTextEditing) {
+      console.log('📝 In text editing mode, ignoring keydown for key:', event.key);
+      return;
+    }
     
     const activeObject = fabricCanvasRef.current.getActiveObject();
     
-    // Delete selected element
-    if (event.key === 'Delete' || event.key === 'Backspace') {
+    // Delete selected element (only when not editing text)
+    if ((event.key === 'Delete' || event.key === 'Backspace') && !isTextEditing) {
       if (activeObject && activeObject.data?.elementId) {
         dispatch(deleteElement({
           slideId,
@@ -237,6 +390,11 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
 
     // Text editing events
     canvas.on('text:editing:entered', (e) => {
+      console.log('🎯 TEXT EDITING ENTERED:', { 
+        target: e.target?.type, 
+        elementId: e.target?.data?.elementId,
+        isTextEditing: isTextEditing 
+      });
       setIsTextEditing(true);
       const target = e.target;
       if (target) {
@@ -246,13 +404,20 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
           borderDashArray: [5, 5],
         });
         canvas.renderAll();
+        console.log('✅ Text editing visual feedback applied');
       }
     });
 
     canvas.on('text:editing:exited', (e) => {
+      console.log('🚪 TEXT EDITING EXITED:', { 
+        target: e.target?.type, 
+        elementId: e.target?.data?.elementId,
+        text: (e.target as fabric.Textbox)?.text 
+      });
       const target = e.target;
       if (target && target.data?.elementId) {
         const textbox = target as fabric.Textbox;
+        console.log('💾 Updating Redux with text:', textbox.text);
         // Update text content in Redux store
         dispatch(updateElement({
           slideId,
@@ -266,14 +431,23 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
           borderDashArray: undefined,
         });
         canvas.renderAll();
+        console.log('🎨 Visual feedback removed');
       }
       setIsTextEditing(false);
+      console.log('📝 Text editing state set to false');
     });
 
     canvas.on('text:changed', (e) => {
+      console.log('📝 TEXT CHANGED:', { 
+        target: e.target?.type, 
+        elementId: e.target?.data?.elementId,
+        text: (e.target as fabric.Textbox)?.text,
+        isTextEditing: isTextEditing
+      });
       const target = e.target;
       if (target && target.data?.elementId) {
         const textbox = target as fabric.Textbox;
+        console.log('🔄 Real-time text update:', textbox.text);
         // Update text content in real-time
         dispatch(updateElement({
           slideId,
@@ -316,6 +490,10 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
       
       canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, newZoom);
       setZoom(newZoom);
+      
+      // Notify virtualization service of viewport change
+      canvasVirtualizationService.onViewportChange();
+      
       opt.e.preventDefault();
       opt.e.stopPropagation();
     });
@@ -473,8 +651,16 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
     // Set up canvas event handlers
     setupCanvasEventHandlers(canvas);
 
+    // Initialize performance optimizations
+    canvasVirtualizationService.initialize(canvas);
+    memoryManagementService.registerCanvas(canvas);
+
     // Cleanup function
     return () => {
+      // Cleanup performance services
+      canvasVirtualizationService.cleanup();
+      memoryManagementService.unregisterCanvas(canvas);
+      
       canvas.dispose();
       fabricCanvasRef.current = null;
       setIsCanvasReady(false);
@@ -499,7 +685,10 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
     canvas.clear();
     canvas.backgroundColor = '#ffffff';
 
-    // Load elements from slide data
+    // Update virtualization service with new elements
+    canvasVirtualizationService.updateElements(currentSlide.elements);
+
+    // Load elements from slide data (virtualization service will handle which ones to actually render)
     currentSlide.elements.forEach((element) => {
       createFabricObjectFromElement(element, canvas);
     });
@@ -860,131 +1049,9 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
         enableZIndexManagement: true,
       });
     }
-  }, [fabricCanvasRef.current, presentation?.settings]);
+  }, [presentation?.settings]);
 
-  // Enhanced drag-and-drop handlers
-  const handleToolbarDragStart = useCallback((e: React.DragEvent, elementType: string) => {
-    const target = e.target as HTMLElement;
-    const preview = dragDropService.createDragPreview(target, elementType as any);
-    document.body.appendChild(preview);
-    
-    dragDropService.startDrag('toolbar', { elementType }, preview);
-    
-    e.dataTransfer.setData('text/plain', elementType);
-    e.dataTransfer.effectAllowed = 'copy';
-    
-    setIsDraggingText(elementType === 'text');
-  }, []);
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'copy';
-    
-    // Update drag preview position
-    dragDropService.updateDragPreview(e.clientX, e.clientY);
-  }, []);
-
-  const handleDrop = useCallback(async (e: React.DragEvent) => {
-    e.preventDefault();
-    
-    if (!fabricCanvasRef.current || !canvasRef.current) return;
-    
-    const dragState = dragDropService.getDragState();
-    const dropPosition = dragDropService.getDropPosition(e.nativeEvent, canvasRef.current);
-    
-    // Handle different drop types
-    if (dragState.dragType === 'toolbar') {
-      const elementType = dragState.dragData.elementType;
-      
-      // Apply snap-to-grid and guides
-      const snappedResult = dragDropService.findSnapPosition(
-        dropPosition,
-        { width: 200, height: 50 }, // Default size
-        currentSlide?.elements || [],
-        []
-      );
-      
-      // Show snap guides briefly
-      if (snappedResult.guides.length > 0) {
-        dragDropService.showSnapGuides(snappedResult.guides);
-        setTimeout(() => dragDropService.hideSnapGuides(), 1000);
-      }
-      
-      // Create element based on type
-      switch (elementType) {
-        case 'text':
-          addTextElementAtPosition(snappedResult.position.x, snappedResult.position.y, true);
-          break;
-        case 'image':
-          setShowImageImportDialog(true);
-          break;
-        default:
-          console.warn(`Unsupported toolbar element type: ${elementType}`);
-      }
-    } else if (dragState.dragType === 'file') {
-      // Handle file drops
-      const files = e.dataTransfer.files;
-      if (files && files.length > 0) {
-        await handleFilesDrop(files, dropPosition);
-      }
-    }
-    
-    // Clean up drag state
-    dragDropService.endDrag();
-    setIsDraggingText(false);
-    
-    // Remove drag preview
-    if (dragState.dragPreview && dragState.dragPreview.parentNode) {
-      dragState.dragPreview.parentNode.removeChild(dragState.dragPreview);
-    }
-  }, [addTextElementAtPosition, currentSlide?.elements]);
-
-  const handleFilesDrop = useCallback(async (files: FileList, position: Position) => {
-    const { valid, invalid } = dragDropService.validateDroppedFiles(files);
-    
-    if (invalid.length > 0) {
-      console.warn('Invalid files dropped:', invalid.map(f => f.name));
-    }
-    
-    for (const file of valid) {
-      if (file.type.startsWith('image/')) {
-        try {
-          const imageInfo = await getImageInfo(file);
-          const imageUrl = URL.createObjectURL(file);
-          
-          // Apply snap positioning
-          const snappedResult = dragDropService.findSnapPosition(
-            position,
-            { width: imageInfo.width, height: imageInfo.height },
-            currentSlide?.elements || [],
-            []
-          );
-          
-          const newElement: Omit<SlideElement, 'id' | 'createdAt' | 'updatedAt'> = {
-            type: 'image',
-            position: snappedResult.position,
-            size: { width: imageInfo.width, height: imageInfo.height },
-            properties: {
-              src: imageUrl,
-              alt: file.name,
-              opacity: 1,
-            },
-            content: imageUrl,
-          };
-          
-          dispatch(addElement({ slideId, element: newElement }));
-          
-          // Show snap guides briefly
-          if (snappedResult.guides.length > 0) {
-            dragDropService.showSnapGuides(snappedResult.guides);
-            setTimeout(() => dragDropService.hideSnapGuides(), 1000);
-          }
-        } catch (error) {
-          console.error('Error processing dropped image:', error);
-        }
-      }
-    }
-  }, [dispatch, slideId, currentSlide?.elements]);
+  // Removed drag-and-drop functionality to prevent issues
 
   // Enhanced object movement with snap-to-grid
   const handleObjectMoving = useCallback((e: fabric.IEvent) => {
@@ -1092,19 +1159,12 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
     }
   }, [dispatch, slideId]);
 
-  // Handle drag start for text element
-  const handleTextDragStart = (e: React.DragEvent) => {
-    handleToolbarDragStart(e, 'text');
-  };
 
-  // Handle drag start for image element
-  const handleImageDragStart = (e: React.DragEvent) => {
-    handleToolbarDragStart(e, 'image');
-  };
 
-  // Add text element (fallback for button click)
+  // Add text element (button click only)
   const addTextElement = () => {
-    addTextElementAtPosition(100, 100);
+    console.log('🔘 Text button clicked, calling addTextElementAtPosition');
+    addTextElementAtPosition(400, 300); // Center of canvas
   };
 
   // Add shape element
@@ -1198,21 +1258,19 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
     <div className="slide-canvas-container">
       <div className="canvas-toolbar">
         <button 
-          draggable
-          onDragStart={handleTextDragStart}
           onClick={addTextElement} 
-          className={`toolbar-button draggable-button ${isDraggingText ? 'dragging' : ''}`}
-          title="Drag to canvas or click to add text"
+          className="toolbar-button"
+          type="button"
+          title="Click to add text element"
         >
           📝 Text
         </button>
         
         <button 
-          draggable
-          onDragStart={handleImageDragStart}
           onClick={() => setShowImageImportDialog(true)} 
-          className="toolbar-button draggable-button"
-          title="Drag to canvas or click to add image"
+          className="toolbar-button"
+          type="button"
+          title="Click to add image"
         >
           🖼️ Image
         </button>
@@ -1327,16 +1385,26 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
       
       <div 
         className="canvas-wrapper"
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
+        role="img"
+        aria-label={`Slide canvas: ${currentSlide?.title || 'Untitled slide'}`}
+        aria-describedby="canvas-instructions"
       >
         <canvas
           ref={canvasRef}
           className="slide-canvas"
           tabIndex={0} // Make canvas focusable for keyboard events
+          aria-label="Slide editing canvas"
+          role="application"
         />
+        
+        {/* Screen reader instructions */}
+        <div id="canvas-instructions" className="sr-only">
+          Use Ctrl+T to add text, Delete to remove selected elements, 
+          Enter to edit text, Escape to exit editing mode, 
+          Arrow keys to move selected elements.
+        </div>
       </div>
-      <div className="canvas-info">
+      <div className="canvas-info" role="status" aria-live="polite">
         <p>Hold Alt + drag to pan • Mouse wheel to zoom • Delete key to remove selected object • Double-click text to edit • Drag images directly onto canvas</p>
       </div>
       

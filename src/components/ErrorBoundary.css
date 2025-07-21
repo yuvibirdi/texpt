@@ -1,0 +1,185 @@
+.error-boundary {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.error-boundary__container {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.error-boundary__icon {
+  color: #ef4444;
+  margin-bottom: 1rem;
+}
+
+.error-boundary__title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 1rem 0;
+}
+
+.error-boundary__message {
+  color: #6b7280;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+}
+
+.error-boundary__details {
+  margin: 1.5rem 0;
+  text-align: left;
+}
+
+.error-boundary__details summary {
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.error-boundary__details summary:hover {
+  color: #374151;
+}
+
+.error-boundary__technical {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 1rem;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.error-boundary__technical p {
+  margin: 0 0 0.5rem 0;
+}
+
+.error-boundary__technical p:last-child {
+  margin-bottom: 0;
+}
+
+.error-boundary__stack {
+  background: #1f2937;
+  color: #f9fafb;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  overflow-x: auto;
+  margin-top: 0.5rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.error-boundary__actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+
+.error-boundary__button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  min-width: 120px;
+}
+
+.error-boundary__button--primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.error-boundary__button--primary:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.error-boundary__button--secondary {
+  background: #6b7280;
+  color: white;
+}
+
+.error-boundary__button--secondary:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
+.error-boundary__button--tertiary {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.error-boundary__button--tertiary:hover {
+  background: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+.error-boundary__help {
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-top: 1.5rem;
+  text-align: left;
+}
+
+.error-boundary__help p {
+  margin: 0 0 0.5rem 0;
+  color: #92400e;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.error-boundary__help ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #92400e;
+  font-size: 0.875rem;
+}
+
+.error-boundary__help li {
+  margin-bottom: 0.25rem;
+}
+
+.error-boundary__help li:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .error-boundary__container {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  
+  .error-boundary__actions {
+    flex-direction: column;
+  }
+  
+  .error-boundary__button {
+    width: 100%;
+  }
+}

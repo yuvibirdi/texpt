@@ -57,15 +57,33 @@ class LaTeXCompilerBrowser extends EventEmitter implements ILatexCompiler {
     }, 200);
 
     setTimeout(() => {
-      // Mock compilation result - always fails in browser
+      this.emit('progress', {
+        jobId,
+        stage: 'completed',
+        progress: 100,
+        message: 'Compilation completed (browser mode)',
+      } as CompilationProgress);
+
+      // Mock compilation result - provide helpful message for browser
       const result: CompilationResult = {
         success: false,
-        log: 'LaTeX compilation is not available in browser environment. Please use the desktop application.',
+        log: `LaTeX compilation is not available in browser environment.
+
+To enable LaTeX compilation:
+1. Download and install the desktop application
+2. Or install LaTeX locally (TeX Live, MiKTeX, or MacTeX)
+3. The desktop app will automatically detect your LaTeX installation
+
+Current source preview:
+${source.substring(0, 200)}${source.length > 200 ? '...' : ''}`,
         errors: [{
-          message: 'LaTeX compilation requires a desktop environment with LaTeX installed',
-          type: 'fatal',
+          message: 'LaTeX compilation requires a desktop environment with LaTeX installed. This is a browser preview mode.',
+          type: 'error',
         }],
-        warnings: [],
+        warnings: [{
+          message: 'Switch to desktop application for full LaTeX compilation support',
+          type: 'info',
+        }],
         duration: 300,
         jobId,
       };
@@ -132,21 +150,36 @@ class LaTeXCompilerBrowser extends EventEmitter implements ILatexCompiler {
  * Factory function to create the appropriate LaTeX compiler instance
  */
 function createLatexCompiler(): ILatexCompiler {
-  // Check if we're in a browser environment
-  if (typeof window !== 'undefined') {
-    return new LaTeXCompilerBrowser();
+  // Check if we're in a Node.js environment (Electron main process)
+  const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
+  
+  if (isNode) {
+    // Try to load the Node.js version
+    try {
+      // Use eval to prevent webpack from bundling the Node.js-specific module
+      const nodeModule = eval('require')('./latexCompilerNode');
+      const { LaTeXCompilerNode } = nodeModule;
+      return new LaTeXCompilerNode();
+    } catch (error) {
+      // Fallback to browser version if Node.js version fails to load
+      return new LaTeXCompilerBrowser();
+    }
   }
 
-  // Try to load the Node.js version
-  try {
-    // Use eval to prevent webpack from bundling the Node.js-specific module
-    const nodeModule = eval('require')('./latexCompilerNode');
-    const { LaTeXCompilerNode } = nodeModule;
-    return new LaTeXCompilerNode();
-  } catch (error) {
-    // Fallback to browser version if Node.js version fails to load
-    return new LaTeXCompilerBrowser();
+  // Check if we're in an Electron renderer process
+  const globalWindow = typeof globalThis !== 'undefined' && (globalThis as any).window;
+  if (globalWindow && globalWindow.electronAPI && typeof globalWindow.electronAPI.compileLatex === 'function') {
+    try {
+      // Use dynamic import to avoid bundling issues
+      const { LaTeXCompilerElectron } = require('./latexCompilerElectron');
+      return new LaTeXCompilerElectron();
+    } catch (error) {
+      console.warn('Failed to load Electron LaTeX compiler, falling back to browser version:', error);
+    }
   }
+
+  // Default to browser version
+  return new LaTeXCompilerBrowser();
 }
 
 // Export singleton instance

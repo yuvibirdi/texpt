@@ -47,10 +47,11 @@ const createDefaultPresentation = (): Presentation => ({
   version: '1.0.0',
 });
 
+const defaultPresentation = createDefaultPresentation();
 const initialState: PresentationState = {
-  currentPresentation: createDefaultPresentation(),
+  currentPresentation: defaultPresentation,
   presentations: [],
-  currentSlideId: null,
+  currentSlideId: defaultPresentation.slides[0]?.id || null,
   isModified: false,
   lastSaved: null,
 };

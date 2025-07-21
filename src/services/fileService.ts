@@ -122,6 +122,9 @@ export class FileService {
       if (filePath) {
         result = await this.writeFile(filePath, jsonData);
       } else {
+        if (!window.electronAPI) {
+          throw new Error('Electron API not available');
+        }
         result = await window.electronAPI.saveFile(jsonData);
       }
 
@@ -158,6 +161,9 @@ export class FileService {
       if (filePath) {
         fileResult = await this.readFile(filePath);
       } else {
+        if (!window.electronAPI) {
+          throw new Error('Electron API not available');
+        }
         fileResult = await window.electronAPI.openFile();
       }
 
@@ -624,17 +630,26 @@ export class FileService {
   private async writeFile(filePath: string, content: string): Promise<FileOperationResult> {
     // This would be implemented using Node.js fs in the main process
     // For now, we'll use the existing electron API
+    if (!window.electronAPI) {
+      throw new Error('Electron API not available');
+    }
     return await window.electronAPI.saveFile(content);
   }
 
   private async readFile(filePath: string): Promise<any> {
     // This would be implemented using Node.js fs in the main process
     // For now, we'll use the existing electron API
+    if (!window.electronAPI) {
+      throw new Error('Electron API not available');
+    }
     return await window.electronAPI.openFile();
   }
 
   private async getAppVersion(): Promise<string> {
     try {
+      if (!window.electronAPI) {
+        return '1.0.0';
+      }
       return await window.electronAPI.getAppVersion();
     } catch {
       return '1.0.0';
@@ -643,6 +658,9 @@ export class FileService {
 
   private async getPlatform(): Promise<string> {
     try {
+      if (!window.electronAPI) {
+        return 'unknown';
+      }
       return await window.electronAPI.getPlatform();
     } catch {
       return 'unknown';

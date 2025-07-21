@@ -1,6 +1,6 @@
-// Global type definitions for Electron API exposed via preload script
+// Global type declarations for Electron API
 
-export interface ElectronAPI {
+interface ElectronAPI {
   // File operations
   openFile: () => Promise<{
     success: boolean;
@@ -9,29 +9,7 @@ export interface ElectronAPI {
     error?: string;
     canceled?: boolean;
   }>;
-  
   saveFile: (data: any) => Promise<{
-    success: boolean;
-    filePath?: string;
-    error?: string;
-    canceled?: boolean;
-  }>;
-
-  // Export operations
-  exportWriteFile: (filePath: string, content: string) => Promise<{
-    success: boolean;
-    error?: string;
-  }>;
-
-  exportWriteFileBuffer: (filePath: string, buffer: Buffer) => Promise<{
-    success: boolean;
-    error?: string;
-  }>;
-
-  exportSaveFile: (content: string, options: {
-    format: string;
-    defaultFileName?: string;
-  }) => Promise<{
     success: boolean;
     filePath?: string;
     error?: string;
@@ -44,28 +22,20 @@ export interface ElectronAPI {
     jobId?: string;
     error?: string;
   }>;
-  
   cancelLatexJob: (jobId: string) => Promise<{
     success: boolean;
     cancelled?: boolean;
     error?: string;
   }>;
-  
   getLatexQueueStatus: () => Promise<{
     success: boolean;
-    status?: {
-      queued: number;
-      active: number;
-      total: number;
-    };
+    status?: { queued: number; active: number; total: number };
     error?: string;
   }>;
-  
   clearLatexQueue: () => Promise<{
     success: boolean;
     error?: string;
   }>;
-  
   checkLatexAvailability: () => Promise<{
     success: boolean;
     available?: boolean;
@@ -85,6 +55,34 @@ export interface ElectronAPI {
   getAppName: () => Promise<string>;
   getPlatform: () => Promise<string>;
   
+  // Export operations
+  exportSaveFile: (data: string, options?: any) => Promise<{
+    success: boolean;
+    filePath?: string;
+    fileSize?: number;
+    error?: string;
+    canceled?: boolean;
+  }>;
+  exportWriteFile: (filePath: string, content: string) => Promise<{
+    success: boolean;
+    filePath?: string;
+    fileSize?: number;
+    error?: string;
+  }>;
+  exportWriteFileBuffer: (filePath: string, buffer: Buffer) => Promise<{
+    success: boolean;
+    filePath?: string;
+    fileSize?: number;
+    error?: string;
+  }>;
+  exportGetFileStats: (filePath: string) => Promise<{
+    success: boolean;
+    size?: number;
+    created?: Date;
+    modified?: Date;
+    error?: string;
+  }>;
+  
   // Error reporting
   reportError: (error: any) => Promise<{ success: boolean }>;
   
@@ -92,36 +90,8 @@ export interface ElectronAPI {
   onMenuAction: (callback: (action: string) => void) => void;
   
   // LaTeX compilation events
-  onLatexProgress: (callback: (progress: {
-    jobId: string;
-    stage: 'queued' | 'preparing' | 'compiling' | 'processing' | 'completed' | 'failed';
-    progress: number;
-    message: string;
-  }) => void) => void;
-  
-  onLatexJobCompleted: (callback: (result: {
-    success: boolean;
-    pdfPath?: string;
-    pdfBuffer?: Buffer;
-    log: string;
-    errors: Array<{
-      line?: number;
-      column?: number;
-      message: string;
-      type: 'error' | 'fatal';
-      file?: string;
-      context?: string;
-    }>;
-    warnings: Array<{
-      line?: number;
-      message: string;
-      file?: string;
-      type: 'warning' | 'info';
-    }>;
-    duration: number;
-    jobId: string;
-  }) => void) => void;
-  
+  onLatexProgress: (callback: (progress: any) => void) => void;
+  onLatexJobCompleted: (callback: (result: any) => void) => void;
   onLatexJobCancelled: (callback: (data: { jobId: string }) => void) => void;
   
   // Remove listeners
@@ -130,6 +100,8 @@ export interface ElectronAPI {
 
 declare global {
   interface Window {
-    electronAPI: ElectronAPI;
+    electronAPI?: ElectronAPI;
   }
 }
+
+export {};

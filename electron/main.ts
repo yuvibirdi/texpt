@@ -2,10 +2,10 @@ import { app, BrowserWindow, Menu, ipcMain, dialog } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import isDev from 'electron-is-dev';
-import { LaTeXCompiler } from '../src/services/latexCompiler';
+import { latexCompiler, ILatexCompiler } from '../src/services/latexCompilerFactory';
 
 let mainWindow: BrowserWindow;
-let latexCompiler: LaTeXCompiler;
+let latexCompilerInstance: ILatexCompiler;
 
 function createWindow(): void {
   // Create the browser window
@@ -25,10 +25,8 @@ function createWindow(): void {
     icon: isDev ? undefined : path.join(__dirname, '../build/icon.png') // App icon for production
   });
 
-  // Load the app
-  const startUrl = isDev 
-    ? 'http://localhost:3000' 
-    : `file://${path.join(__dirname, '../build/index.html')}`;
+  // Load the app - force production mode for now
+  const startUrl = `file://${path.join(__dirname, '../../../build/index.html')}`;
   
   mainWindow.loadURL(startUrl);
 
@@ -61,7 +59,7 @@ function createWindow(): void {
 // This method will be called when Electron has finished initialization
 app.whenReady().then(() => {
   // Initialize LaTeX compiler
-  latexCompiler = new LaTeXCompiler();
+  latexCompilerInstance = latexCompiler;
   setupLatexCompilerEvents();
 
   createWindow();
@@ -86,26 +84,26 @@ app.on('window-all-closed', () => {
 
 // Cleanup on app quit
 app.on('before-quit', async () => {
-  if (latexCompiler) {
-    await latexCompiler.cleanup();
+  if (latexCompilerInstance) {
+    await latexCompilerInstance.cleanup();
   }
 });
 
 function setupLatexCompilerEvents(): void {
   // Forward LaTeX compiler events to renderer process
-  latexCompiler.on('progress', (progress) => {
+  latexCompilerInstance.on('progress', (progress) => {
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('latex:progress', progress);
     }
   });
 
-  latexCompiler.on('job-completed', (result) => {
+  latexCompilerInstance.on('job-completed', (result) => {
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('latex:job-completed', result);
     }
   });
 
-  latexCompiler.on('job-cancelled', (data) => {
+  latexCompilerInstance.on('job-cancelled', (data) => {
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('latex:job-cancelled', data);
     }
@@ -129,6 +127,14 @@ function createMenu(): void {
           accelerator: 'CmdOrCtrl+O',
           click: () => {
             mainWindow.webContents.send('menu-action', 'open-presentation');
+          }
+        },
+        { type: 'separator' },
+        {
+          label: 'Import PowerPoint...',
+          accelerator: 'CmdOrCtrl+I',
+          click: () => {
+            mainWindow.webContents.send('menu-action', 'import-pptx');
           }
         },
         {
@@ -395,7 +401,7 @@ function setupIpcHandlers(): void {
   // LaTeX compilation handlers
   ipcMain.handle('latex:compile', async (_event, source: string, options: any = {}) => {
     try {
-      const jobId = await latexCompiler.compile(source, options);
+      const jobId = await latexCompilerInstance.compile(source, options);
       return { success: true, jobId };
     } catch (error) {
       return {
@@ -407,7 +413,7 @@ function setupIpcHandlers(): void {
 
   ipcMain.handle('latex:cancel', async (_event, jobId: string) => {
     try {
-      const cancelled = latexCompiler.cancelJob(jobId);
+      const cancelled = latexCompilerInstance.cancelJob(jobId);
       return { success: true, cancelled };
     } catch (error) {
       return {
@@ -419,7 +425,7 @@ function setupIpcHandlers(): void {
 
   ipcMain.handle('latex:getQueueStatus', async () => {
     try {
-      const status = latexCompiler.getQueueStatus();
+      const status = latexCompilerInstance.getQueueStatus();
       return { success: true, status };
     } catch (error) {
       return {
@@ -431,7 +437,7 @@ function setupIpcHandlers(): void {
 
   ipcMain.handle('latex:clearQueue', async () => {
     try {
-      latexCompiler.clearQueue();
+      latexCompilerInstance.clearQueue();
       return { success: true };
     } catch (error) {
       return {
@@ -443,7 +449,7 @@ function setupIpcHandlers(): void {
 
   ipcMain.handle('latex:checkAvailability', async () => {
     try {
-      const availability = await latexCompiler.checkLatexAvailability();
+      const availability = await latexCompilerInstance.checkLatexAvailability();
       return { success: true, ...availability };
     } catch (error) {
       return {

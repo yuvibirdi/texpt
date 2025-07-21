@@ -2,12 +2,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import presentationReducer from './slices/presentationSlice';
 import uiReducer from './slices/uiSlice';
 import themeReducer from './slices/themeSlice';
+import undoRedoReducer from './slices/undoRedoSlice';
 
 export const store = configureStore({
   reducer: {
     presentation: presentationReducer,
     ui: uiReducer,
     theme: themeReducer,
+    undoRedo: undoRedoReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -22,6 +24,7 @@ export const store = configureStore({
           'payload.element.updatedAt',
           'payload.updates.createdAt',
           'payload.updates.updatedAt',
+          'payload.presentationState',
         ],
         // Ignore these paths in the state
         ignoredPaths: [

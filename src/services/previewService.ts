@@ -3,6 +3,7 @@ import { Presentation, Slide } from '../types/presentation';
 import { latexCompiler, ILatexCompiler } from './latexCompilerFactory';
 import { CompilationResult, CompilationProgress } from './latexCompiler';
 import { latexGenerator } from './latexGenerator';
+import { compilationCacheService } from './compilationCacheService';
 
 export interface PreviewState {
   isCompiling: boolean;
@@ -99,6 +100,24 @@ export class PreviewService extends EventEmitter {
             optimizeCode: true,
           });
 
+          // Check cache for each slide first
+          let cachedResult: CompilationResult | null = null;
+          if (presentation.slides.length === 1) {
+            // For single slide, check cache
+            cachedResult = compilationCacheService.getCachedResult(
+              presentation.slides[0],
+              presentation,
+              latexSource
+            );
+          }
+
+          if (cachedResult && cachedResult.success) {
+            // Use cached result
+            this.handleCompilationResult(cachedResult);
+            resolve(cachedResult.jobId);
+            return;
+          }
+
           // Start compilation
           const jobId = await latexCompiler.compile(latexSource, {
             compiler: this.options.compiler,
@@ -112,6 +131,17 @@ export class PreviewService extends EventEmitter {
           const handleCompleted = (result: CompilationResult) => {
             if (result.jobId === jobId) {
               latexCompiler.off('job-completed', handleCompleted);
+              
+              // Cache the result if successful
+              if (result.success && presentation.slides.length === 1) {
+                compilationCacheService.cacheResult(
+                  presentation.slides[0],
+                  presentation,
+                  latexSource,
+                  result
+                );
+              }
+              
               if (result.success) {
                 resolve(jobId);
               } else {

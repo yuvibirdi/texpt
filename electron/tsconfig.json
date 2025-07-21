@@ -15,11 +15,17 @@
   },
   "include": [
     "**/*",
-    "../src/services/latexCompiler.ts"
+    "../src/services/latexCompilerNode.ts",
+    "../src/services/latexCompilerFactory.ts",
+    "../src/services/latexGenerator.ts",
+    "../src/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "build",
-    "dist"
+    "dist",
+    "../src/services/__tests__",
+    "../src/**/*.test.ts",
+    "../src/services/latexCompilerElectron.ts"
   ]
 }

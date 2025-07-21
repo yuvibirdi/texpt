@@ -121,13 +121,20 @@ export class LaTeXCompilerNode extends EventEmitter {
    * Check if LaTeX is available on the system
    */
   public async checkLatexAvailability(): Promise<{ available: boolean; compilers: string[]; version?: string }> {
-    const compilers = ['pdflatex', 'xelatex', 'lualatex'];
+    // Hardcoded paths for development on macOS with TeX Live
+    const compilerPaths = {
+      'pdflatex': '/Library/TeX/texbin/pdflatex',
+      'xelatex': '/Library/TeX/texbin/xelatex',
+      'lualatex': '/Library/TeX/texbin/lualatex'
+    };
+    
     const availableCompilers: string[] = [];
     let version: string | undefined;
 
-    for (const compiler of compilers) {
+    for (const [compiler, fullPath] of Object.entries(compilerPaths)) {
       try {
-        const result = await this.runCommand(compiler, ['--version'], { timeout: 5000 });
+        // First try the hardcoded path
+        const result = await this.runCommand(fullPath, ['--version'], { timeout: 5000 });
         if (result.success) {
           availableCompilers.push(compiler);
           if (!version && result.stdout) {
@@ -139,7 +146,21 @@ export class LaTeXCompilerNode extends EventEmitter {
           }
         }
       } catch (error) {
-        // Compiler not available
+        // Try fallback to system PATH
+        try {
+          const result = await this.runCommand(compiler, ['--version'], { timeout: 5000 });
+          if (result.success) {
+            availableCompilers.push(compiler);
+            if (!version && result.stdout) {
+              const versionMatch = result.stdout.match(/\d+\.\d+/);
+              if (versionMatch) {
+                version = versionMatch[0];
+              }
+            }
+          }
+        } catch (fallbackError) {
+          // Compiler not available
+        }
       }
     }
 
@@ -236,6 +257,10 @@ export class LaTeXCompilerNode extends EventEmitter {
     workingDir: string
   ): Promise<{ success: boolean; stdout: string; stderr: string }> {
     const compiler = job.options.compiler || 'pdflatex';
+    
+    // Get the full path to the compiler
+    const compilerPath = this.getCompilerPath(compiler);
+    
     const args = [
       '-interaction=nonstopmode',
       '-file-line-error',
@@ -263,7 +288,7 @@ export class LaTeXCompilerNode extends EventEmitter {
     for (let run = 1; run <= maxRuns; run++) {
       this.emitProgress(job.id, 'compiling', 30 + (run - 1) * 20, `Compilation pass ${run}/${maxRuns}`);
       
-      lastResult = await this.runCommand(compiler, args, {
+      lastResult = await this.runCommand(compilerPath, args, {
         cwd: workingDir,
         timeout: job.options.timeout || 30000,
       });
@@ -276,6 +301,20 @@ export class LaTeXCompilerNode extends EventEmitter {
     }
 
     return lastResult;
+  }
+
+  /**
+   * Get the full path to a LaTeX compiler
+   */
+  private getCompilerPath(compiler: string): string {
+    const compilerPaths: { [key: string]: string } = {
+      'pdflatex': '/Library/TeX/texbin/pdflatex',
+      'xelatex': '/Library/TeX/texbin/xelatex',
+      'lualatex': '/Library/TeX/texbin/lualatex'
+    };
+    
+    // Return hardcoded path if available, otherwise fallback to system PATH
+    return compilerPaths[compiler] || compiler;
   }
 
   /**
