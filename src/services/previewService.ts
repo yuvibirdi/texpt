@@ -77,63 +77,83 @@ export class PreviewService extends EventEmitter {
    * Manually trigger compilation
    */
   public compilePresentation(presentation: Presentation): Promise<string> {
+    console.log('[Preview Service] Starting compilation for presentation:', presentation.title);
+    console.log('[Preview Service] Presentation has', presentation.slides.length, 'slides');
+    
     return new Promise((resolve, reject) => {
       // Clear existing timeout
       if (this.compilationTimeout) {
+        console.log('[Preview Service] Clearing existing compilation timeout');
         clearTimeout(this.compilationTimeout);
       }
 
       // Cancel existing compilation
       if (this.currentJobId) {
+        console.log('[Preview Service] Cancelling existing job:', this.currentJobId);
         latexCompiler.cancelJob(this.currentJobId);
       }
 
       // Debounce compilation
+      console.log('[Preview Service] Setting compilation timeout with debounce:', this.options.debounceMs, 'ms');
       this.compilationTimeout = setTimeout(async () => {
         try {
+          console.log('[Preview Service] Starting actual compilation process');
           this.emit('compilation-started');
 
           // Generate LaTeX source
+          console.log('[Preview Service] Generating LaTeX source...');
           const latexSource = latexGenerator.generateDocument(presentation, {
             includePackages: true,
             includeDocumentClass: true,
             optimizeCode: true,
           });
+          console.log('[Preview Service] Generated LaTeX source length:', latexSource.length);
+          console.log('[Preview Service] LaTeX source preview:', latexSource.substring(0, 500) + (latexSource.length > 500 ? '...' : ''));
 
           // Check cache for each slide first
           let cachedResult: CompilationResult | null = null;
           if (presentation.slides.length === 1) {
-            // For single slide, check cache
+            console.log('[Preview Service] Checking cache for single slide...');
             cachedResult = compilationCacheService.getCachedResult(
               presentation.slides[0],
               presentation,
               latexSource
             );
+            console.log('[Preview Service] Cache result:', cachedResult ? 'found' : 'not found');
           }
 
           if (cachedResult && cachedResult.success) {
-            // Use cached result
+            console.log('[Preview Service] Using cached compilation result');
             this.handleCompilationResult(cachedResult);
             resolve(cachedResult.jobId);
             return;
           }
 
           // Start compilation
+          console.log('[Preview Service] Starting fresh compilation with options:', {
+            compiler: this.options.compiler,
+            timeout: this.options.timeout,
+            synctex: true,
+          });
+          
           const jobId = await latexCompiler.compile(latexSource, {
             compiler: this.options.compiler,
             timeout: this.options.timeout,
             synctex: true,
           });
 
+          console.log('[Preview Service] Compilation job started with ID:', jobId);
           this.currentJobId = jobId;
 
           // Set up one-time listeners for this specific job
           const handleCompleted = (result: CompilationResult) => {
             if (result.jobId === jobId) {
+              console.log('[Preview Service] Compilation completed for job:', jobId, 'Success:', result.success);
               latexCompiler.off('job-completed', handleCompleted);
               
               // Cache the result if successful
               if (result.success && presentation.slides.length === 1) {
+                console.log('[Preview Service] Caching successful compilation result');
                 compilationCacheService.cacheResult(
                   presentation.slides[0],
                   presentation,
@@ -143,8 +163,10 @@ export class PreviewService extends EventEmitter {
               }
               
               if (result.success) {
+                console.log('[Preview Service] Compilation successful, resolving promise');
                 resolve(jobId);
               } else {
+                console.error('[Preview Service] Compilation failed with errors:', result.errors);
                 reject(new Error(result.errors.map(e => e.message).join('; ')));
               }
             }
@@ -153,6 +175,7 @@ export class PreviewService extends EventEmitter {
           latexCompiler.on('job-completed', handleCompleted);
 
         } catch (error) {
+          console.error('[Preview Service] Compilation error:', error);
           this.emit('compilation-error', error);
           reject(error);
         }
@@ -352,7 +375,65 @@ export class PreviewService extends EventEmitter {
     compilers: string[];
     version?: string;
   }> {
-    return latexCompiler.checkLatexAvailability();
+    console.log('🔧 [Preview Service] ===== STARTING LATEX AVAILABILITY CHECK =====');
+    console.log('🔧 [Preview Service] LaTeX compiler instance:', {
+      exists: !!latexCompiler,
+      type: latexCompiler?.constructor?.name,
+      methods: latexCompiler ? Object.getOwnPropertyNames(Object.getPrototypeOf(latexCompiler)) : 'none'
+    });
+    
+    try {
+      console.log('🔧 [Preview Service] Calling latexCompiler.checkLatexAvailability()...');
+      const startTime = Date.now();
+      const result = await latexCompiler.checkLatexAvailability();
+      const duration = Date.now() - startTime;
+      
+      console.log('🔧 [Preview Service] LaTeX availability check completed in', duration, 'ms');
+      console.log('🔧 [Preview Service] Result from compiler:', {
+        available: result.available,
+        compilers: result.compilers,
+        compilersCount: result.compilers?.length || 0,
+        version: result.version,
+        resultType: typeof result,
+        resultKeys: Object.keys(result)
+      });
+      
+      // Validate result structure
+      if (typeof result !== 'object' || result === null) {
+        console.error('❌ [Preview Service] Invalid result type from compiler:', typeof result);
+        throw new Error(`Invalid result type: ${typeof result}`);
+      }
+      
+      if (typeof result.available !== 'boolean') {
+        console.error('❌ [Preview Service] Invalid available field:', result.available);
+        throw new Error(`Invalid available field: ${result.available}`);
+      }
+      
+      if (!Array.isArray(result.compilers)) {
+        console.error('❌ [Preview Service] Invalid compilers field:', result.compilers);
+        throw new Error(`Invalid compilers field: ${result.compilers}`);
+      }
+      
+      console.log('✅ [Preview Service] LaTeX availability check successful');
+      return result;
+    } catch (error) {
+      console.error('❌ [Preview Service] LaTeX availability check failed:', error);
+      console.error('❌ [Preview Service] Error details:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack?.substring(0, 500) : 'No stack trace'
+      });
+      
+      const fallbackResult = {
+        available: false,
+        compilers: [],
+        version: undefined,
+      };
+      console.log('🔧 [Preview Service] Returning fallback result:', fallbackResult);
+      return fallbackResult;
+    } finally {
+      console.log('🔧 [Preview Service] ===== LATEX AVAILABILITY CHECK COMPLETE =====');
+    }
   }
 
   /**

@@ -110,7 +110,11 @@ export class LaTeXCompilerElectron extends EventEmitter implements ILatexCompile
    * Check if LaTeX is available on the system
    */
   public async checkLatexAvailability(): Promise<{ available: boolean; compilers: string[]; version?: string }> {
+    console.log('⚡ [LaTeX Compiler Electron] ===== STARTING LATEX AVAILABILITY CHECK =====');
+    
     if (!window.electronAPI) {
+      console.error('❌ [LaTeX Compiler Electron] No electronAPI available on window object');
+      console.log('⚡ [LaTeX Compiler Electron] Window object keys:', Object.keys(window));
       return {
         available: false,
         compilers: [],
@@ -118,16 +122,29 @@ export class LaTeXCompilerElectron extends EventEmitter implements ILatexCompile
       };
     }
 
+    console.log('⚡ [LaTeX Compiler Electron] ElectronAPI is available, checking methods...');
+    console.log('⚡ [LaTeX Compiler Electron] ElectronAPI methods:', Object.keys(window.electronAPI));
+    console.log('⚡ [LaTeX Compiler Electron] checkLatexAvailability type:', typeof window.electronAPI.checkLatexAvailability);
+
     try {
+      console.log('⚡ [LaTeX Compiler Electron] Calling electronAPI.checkLatexAvailability()...');
+      const startTime = Date.now();
       const result = await window.electronAPI.checkLatexAvailability();
+      const duration = Date.now() - startTime;
+      
+      console.log('⚡ [LaTeX Compiler Electron] IPC call completed in', duration, 'ms');
+      console.log('⚡ [LaTeX Compiler Electron] Raw result from main process:', result);
+      
       if (result.success) {
-        return {
+        const finalResult = {
           available: result.available || false,
           compilers: result.compilers || [],
           version: result.version,
         };
+        console.log('✅ [LaTeX Compiler Electron] LaTeX availability check successful:', finalResult);
+        return finalResult;
       } else {
-        console.error('LaTeX availability check failed:', result.error);
+        console.error('❌ [LaTeX Compiler Electron] LaTeX availability check failed:', result.error);
         return {
           available: false,
           compilers: [],
@@ -135,12 +152,19 @@ export class LaTeXCompilerElectron extends EventEmitter implements ILatexCompile
         };
       }
     } catch (error) {
-      console.error('Failed to check LaTeX availability:', error);
+      console.error('❌ [LaTeX Compiler Electron] Exception during LaTeX availability check:', error);
+      console.error('❌ [LaTeX Compiler Electron] Error details:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : 'No stack trace'
+      });
       return {
         available: false,
         compilers: [],
         version: undefined,
       };
+    } finally {
+      console.log('⚡ [LaTeX Compiler Electron] ===== LATEX AVAILABILITY CHECK COMPLETE =====');
     }
   }
 

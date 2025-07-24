@@ -26,7 +26,11 @@ function createWindow(): void {
   });
 
   // Load the app - force production mode for now
-  const startUrl = `file://${path.join(__dirname, '../../../build/index.html')}`;
+  const startUrl = `file://${path.join(__dirname, '../../index.html')}`;
+  
+  console.log('🖥️ [Electron Main] Loading React app from:', startUrl);
+  console.log('🖥️ [Electron Main] __dirname:', __dirname);
+  console.log('🖥️ [Electron Main] Resolved path:', path.join(__dirname, '../../index.html'));
   
   mainWindow.loadURL(startUrl);
 
@@ -35,11 +39,24 @@ function createWindow(): void {
     mainWindow.show();
   });
 
-  // Open DevTools in development
+  // Always open DevTools for debugging
+  mainWindow.webContents.openDevTools();
+  
+  // Add more logging for debugging
+  mainWindow.webContents.on('did-finish-load', () => {
+    console.log('🖥️ [Electron Main] Page finished loading');
+  });
+  
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    console.error('🖥️ [Electron Main] Page failed to load:', errorCode, errorDescription);
+  });
+  
+  mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
+    console.log(`🖥️ [Renderer Console] ${message}`);
+  });
+  
+  // Enable hot reload for development (optional - requires electron-reload package)
   if (isDev) {
-    mainWindow.webContents.openDevTools();
-    
-    // Enable hot reload for development (optional - requires electron-reload package)
     try {
       require('electron-reload')(__dirname, {
         electron: path.join(__dirname, '..', 'node_modules', '.bin', 'electron'),
@@ -448,14 +465,42 @@ function setupIpcHandlers(): void {
   });
 
   ipcMain.handle('latex:checkAvailability', async () => {
+    console.log('🖥️ [Electron Main] ===== LATEX AVAILABILITY IPC HANDLER =====');
+    console.log('🖥️ [Electron Main] Received latex:checkAvailability IPC call');
+    console.log('🖥️ [Electron Main] LaTeX compiler instance:', {
+      exists: !!latexCompilerInstance,
+      type: latexCompilerInstance?.constructor?.name,
+      methods: latexCompilerInstance ? Object.getOwnPropertyNames(Object.getPrototypeOf(latexCompilerInstance)) : 'none'
+    });
+    
     try {
+      console.log('🖥️ [Electron Main] Calling latexCompilerInstance.checkLatexAvailability()...');
+      const startTime = Date.now();
       const availability = await latexCompilerInstance.checkLatexAvailability();
-      return { success: true, ...availability };
+      const duration = Date.now() - startTime;
+      
+      console.log('🖥️ [Electron Main] LaTeX availability check completed in', duration, 'ms');
+      console.log('🖥️ [Electron Main] Availability result:', availability);
+      
+      const result = { success: true, ...availability };
+      console.log('🖥️ [Electron Main] Returning result to renderer:', result);
+      return result;
     } catch (error) {
-      return {
+      console.error('❌ [Electron Main] LaTeX availability check failed:', error);
+      console.error('❌ [Electron Main] Error details:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack?.substring(0, 500) : 'No stack trace'
+      });
+      
+      const errorResult = {
         success: false,
         error: error instanceof Error ? error.message : String(error)
       };
+      console.log('🖥️ [Electron Main] Returning error result:', errorResult);
+      return errorResult;
+    } finally {
+      console.log('🖥️ [Electron Main] ===== LATEX AVAILABILITY IPC HANDLER COMPLETE =====');
     }
   });
 

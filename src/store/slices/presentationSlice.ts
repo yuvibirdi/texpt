@@ -238,7 +238,20 @@ const presentationSlice = createSlice({
       slideId: string;
       element: Omit<SlideElement, 'id' | 'createdAt' | 'updatedAt'>;
     }>) => {
-      if (!state.currentPresentation) return;
+      console.log('🏪 [Redux] ===== ADD ELEMENT ACTION =====');
+      console.log('🏪 [Redux] Action payload:', {
+        slideId: action.payload.slideId,
+        elementType: action.payload.element.type,
+        elementContent: action.payload.element.content,
+        elementPosition: action.payload.element.position,
+        elementSize: action.payload.element.size,
+        elementProperties: action.payload.element.properties
+      });
+      
+      if (!state.currentPresentation) {
+        console.error('❌ [Redux] No current presentation available');
+        return;
+      }
       
       const slide = state.currentPresentation.slides.find(s => s.id === action.payload.slideId);
       if (slide) {
@@ -249,10 +262,21 @@ const presentationSlice = createSlice({
           updatedAt: new Date(),
         };
         
+        console.log('✅ [Redux] Created new element:', {
+          id: newElement.id,
+          type: newElement.type,
+          content: newElement.content,
+          slideElementsCount: slide.elements.length
+        });
+        
         slide.elements.push(newElement);
         slide.updatedAt = new Date();
         state.currentPresentation.updatedAt = new Date();
         state.isModified = true;
+        
+        console.log('📊 [Redux] Element added successfully, new count:', slide.elements.length);
+      } else {
+        console.error('❌ [Redux] Slide not found:', action.payload.slideId);
       }
     },
     

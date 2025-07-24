@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { previewService, PreviewState } from '../services/previewService';
 import { CompilationProgress } from '../services/latexCompiler';
+import { latexGenerationService } from '../services/latexGenerationService';
 
 interface UsePreviewOptions {
   autoCompile?: boolean;
@@ -140,26 +141,64 @@ export const usePreview = (options: UsePreviewOptions = {}): UsePreviewReturn =>
 
   // Check LaTeX availability on mount
   const checkLatexAvailability = useCallback(async () => {
+    console.log('🎣 [usePreview] ===== STARTING LATEX AVAILABILITY CHECK =====');
+    console.log('🎣 [usePreview] Current state:', {
+      isLatexAvailable,
+      hasPresentation: !!presentation,
+      presentationTitle: presentation?.title,
+      previewError: previewState.error
+    });
+    
     try {
+      console.log('🎣 [usePreview] Calling previewService.checkLatexAvailability()...');
+      const startTime = Date.now();
       const availability = await previewService.checkLatexAvailability();
+      const duration = Date.now() - startTime;
+      
+      console.log('🎣 [usePreview] LaTeX availability check completed in', duration, 'ms');
+      console.log('🎣 [usePreview] Availability result:', {
+        available: availability.available,
+        compilers: availability.compilers,
+        version: availability.version,
+        compilersCount: availability.compilers?.length || 0
+      });
+      
       setIsLatexAvailable(availability.available);
       
       if (!availability.available) {
+        console.warn('❌ [usePreview] LaTeX not available, setting error state');
         setPreviewState(prev => ({
           ...prev,
           error: 'LaTeX not found. Please install TeX Live or MiKTeX.',
           message: 'LaTeX not available',
         }));
+      } else {
+        console.log('✅ [usePreview] LaTeX is available with compilers:', availability.compilers);
+        const message = `LaTeX available (${availability.compilers.join(', ')})${availability.version ? ` v${availability.version}` : ''}`;
+        setPreviewState(prev => ({
+          ...prev,
+          error: null,
+          message,
+        }));
       }
     } catch (error) {
+      console.error('❌ [usePreview] LaTeX availability check failed:', error);
+      console.error('❌ [usePreview] Error details:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack?.substring(0, 300) : 'No stack trace'
+      });
+      
       setIsLatexAvailable(false);
       setPreviewState(prev => ({
         ...prev,
-        error: 'Failed to check LaTeX availability',
+        error: `Failed to check LaTeX availability: ${error instanceof Error ? error.message : String(error)}`,
         message: 'LaTeX check failed',
       }));
+    } finally {
+      console.log('🎣 [usePreview] ===== LATEX AVAILABILITY CHECK COMPLETE =====');
     }
-  }, []);
+  }, [isLatexAvailable, presentation, previewState.error]);
 
   useEffect(() => {
     if (!hasInitialized.current) {
@@ -168,10 +207,22 @@ export const usePreview = (options: UsePreviewOptions = {}): UsePreviewReturn =>
     }
   }, [checkLatexAvailability]);
 
-  // Auto-compile when presentation changes
+  // Auto-compile when presentation changes (but not during text editing)
   useEffect(() => {
     if (presentation && isModified && isLatexAvailable && options.autoCompile !== false) {
-      previewService.updatePreview(presentation);
+      // Check if any text elements are currently being edited
+      // Check if LaTeX generation is in progress (but allow movement updates)
+      const hasEditingText = latexGenerationService.isGenerationInProgress();
+      
+      if (!hasEditingText) {
+        console.log('🎣 [usePreview] Triggering LaTeX compilation (no text being edited)');
+        // Add a small delay to ensure UI updates are complete
+        setTimeout(() => {
+          previewService.updatePreview(presentation);
+        }, 100);
+      } else {
+        console.log('🎣 [usePreview] Skipping LaTeX compilation (text being edited)');
+      }
     }
   }, [presentation, isModified, isLatexAvailable, options.autoCompile]);
 

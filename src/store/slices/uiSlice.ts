@@ -170,10 +170,20 @@ const uiSlice = createSlice({
     
     // Tool selection
     setActiveTool: (state, action: PayloadAction<UIState['activeTool']>) => {
+      console.log('🔧 [UI Redux] ===== SET ACTIVE TOOL =====');
+      console.log('🔧 [UI Redux] Tool change:', {
+        from: state.activeTool,
+        to: action.payload,
+        timestamp: new Date().toISOString()
+      });
+      
       state.activeTool = action.payload;
       if (action.payload !== 'shape') {
         state.activeShapeType = null;
+        console.log('🔧 [UI Redux] Cleared active shape type');
       }
+      
+      console.log('✅ [UI Redux] Active tool updated to:', action.payload);
     },
     
     setActiveShapeType: (state, action: PayloadAction<UIState['activeShapeType']>) => {

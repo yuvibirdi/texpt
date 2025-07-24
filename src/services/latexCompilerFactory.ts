@@ -150,35 +150,84 @@ ${source.substring(0, 200)}${source.length > 200 ? '...' : ''}`,
  * Factory function to create the appropriate LaTeX compiler instance
  */
 function createLatexCompiler(): ILatexCompiler {
-  // Check if we're in a Node.js environment (Electron main process)
-  const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
+  console.log('🏭 [LaTeX Compiler Factory] ===== STARTING COMPILER SELECTION =====');
   
-  if (isNode) {
-    // Try to load the Node.js version
+  // Enhanced environment detection
+  const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
+  const isBrowser = typeof globalThis !== 'undefined' && typeof (globalThis as any).window !== 'undefined';
+  const windowObj = isBrowser ? (globalThis as any).window : null;
+  const isElectron = windowObj && windowObj.electronAPI;
+  const hasRequire = typeof require !== 'undefined';
+  const hasGlobal = typeof global !== 'undefined';
+  const hasModule = typeof module !== 'undefined';
+  
+  console.log('🏭 [LaTeX Compiler Factory] Environment detection:', {
+    isNode,
+    isBrowser,
+    isElectron,
+    hasRequire,
+    hasGlobal,
+    hasModule,
+    processVersions: typeof process !== 'undefined' ? process.versions : 'undefined',
+    electronAPI: isElectron ? 'available' : 'not available',
+    userAgent: isBrowser && windowObj.navigator ? windowObj.navigator.userAgent : 'undefined',
+    location: isBrowser && windowObj.location ? windowObj.location.href : 'undefined'
+  });
+  
+  // Check for Electron API details
+  if (windowObj) {
+    console.log('🏭 [LaTeX Compiler Factory] Window object analysis:', {
+      hasElectronAPI: !!windowObj.electronAPI,
+      electronAPIKeys: windowObj.electronAPI ? Object.keys(windowObj.electronAPI) : 'none',
+      hasCompileLatex: windowObj.electronAPI ? typeof windowObj.electronAPI.compileLatex : 'undefined',
+      hasCheckLatexAvailability: windowObj.electronAPI ? typeof windowObj.electronAPI.checkLatexAvailability : 'undefined'
+    });
+  }
+  
+  // Try Node.js compiler first (for main process or Node.js environment)
+  if (isNode && !isBrowser) {
+    console.log('🏭 [LaTeX Compiler Factory] Detected Node.js environment, attempting to load Node.js LaTeX compiler...');
     try {
       // Use eval to prevent webpack from bundling the Node.js-specific module
       const nodeModule = eval('require')('./latexCompilerNode');
       const { LaTeXCompilerNode } = nodeModule;
+      console.log('✅ [LaTeX Compiler Factory] Successfully loaded Node.js LaTeX compiler');
       return new LaTeXCompilerNode();
     } catch (error) {
-      // Fallback to browser version if Node.js version fails to load
-      return new LaTeXCompilerBrowser();
+      console.error('❌ [LaTeX Compiler Factory] Failed to load Node.js LaTeX compiler:', error);
+      console.log('🏭 [LaTeX Compiler Factory] Falling back to next option...');
     }
   }
 
   // Check if we're in an Electron renderer process
   const globalWindow = typeof globalThis !== 'undefined' && (globalThis as any).window;
-  if (globalWindow && globalWindow.electronAPI && typeof globalWindow.electronAPI.compileLatex === 'function') {
-    try {
-      // Use dynamic import to avoid bundling issues
-      const { LaTeXCompilerElectron } = require('./latexCompilerElectron');
-      return new LaTeXCompilerElectron();
-    } catch (error) {
-      console.warn('Failed to load Electron LaTeX compiler, falling back to browser version:', error);
+  
+  if (globalWindow && (globalWindow as any).electronAPI) {
+    const electronAPI = (globalWindow as any).electronAPI;
+    console.log('🏭 [LaTeX Compiler Factory] Detected Electron environment, checking API...');
+    console.log('🏭 [LaTeX Compiler Factory] Electron API methods:', Object.keys(electronAPI));
+    
+    if (typeof electronAPI.compileLatex === 'function') {
+      console.log('🏭 [LaTeX Compiler Factory] Electron API has compileLatex method, loading Electron compiler...');
+      try {
+        // Use dynamic import to avoid bundling issues
+        const { LaTeXCompilerElectron } = require('./latexCompilerElectron');
+        console.log('✅ [LaTeX Compiler Factory] Successfully loaded Electron LaTeX compiler');
+        return new LaTeXCompilerElectron();
+      } catch (error) {
+        console.error('❌ [LaTeX Compiler Factory] Failed to load Electron LaTeX compiler:', error);
+        console.warn('🏭 [LaTeX Compiler Factory] Falling back to browser version');
+      }
+    } else {
+      console.log('❌ [LaTeX Compiler Factory] Electron API missing compileLatex method');
     }
+  } else {
+    console.log('🏭 [LaTeX Compiler Factory] No Electron API detected');
   }
 
   // Default to browser version
+  console.log('🏭 [LaTeX Compiler Factory] Using browser LaTeX compiler (mock implementation)');
+  console.log('🏭 [LaTeX Compiler Factory] ===== COMPILER SELECTION COMPLETE =====');
   return new LaTeXCompilerBrowser();
 }
 

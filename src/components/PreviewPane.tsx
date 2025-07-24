@@ -9,8 +9,19 @@ interface PreviewPaneProps {
 }
 
 const PreviewPane: React.FC<PreviewPaneProps> = ({ className = '' }) => {
+  console.log('🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====');
+  console.log('🖼️ [PreviewPane] Component props:', { className });
+  
   const presentation = useSelector((state: RootState) => state.presentation.currentPresentation);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  
+  console.log('📊 [PreviewPane] Redux state:', {
+    hasPresentation: !!presentation,
+    presentationTitle: presentation?.title,
+    slideCount: presentation?.slides.length || 0,
+    presentationId: presentation?.id,
+    lastModified: presentation?.updatedAt?.toISOString()
+  });
   
   const {
     previewState,
@@ -22,6 +33,20 @@ const PreviewPane: React.FC<PreviewPaneProps> = ({ className = '' }) => {
   } = usePreview({
     autoCompile: true,
     debounceMs: 500,
+  });
+  
+  console.log('🔍 [PreviewPane] Preview hook state:', {
+    isCompiling: previewState.isCompiling,
+    progress: previewState.progress,
+    stage: previewState.stage,
+    message: previewState.message,
+    hasError: !!previewState.error,
+    error: previewState.error,
+    hasPdfUrl: !!previewState.pdfUrl,
+    pdfUrlLength: previewState.pdfUrl?.length || 0,
+    isLatexAvailable,
+    lastCompiled: previewState.lastCompiled?.toISOString(),
+    currentSlideIndex: previewState.currentSlideIndex
   });
 
   const handleRefresh = async () => {

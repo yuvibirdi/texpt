@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { fabric } from 'fabric';
 import { RootState } from './store';
 import {
   addSlide,
@@ -17,6 +18,7 @@ import { crashRecoveryService, RecoveryData } from './services/crashRecoveryServ
 import { accessibilityService } from './services/accessibilityService';
 import SlideNavigation from './components/SlideNavigation';
 import SlideCanvas from './components/SlideCanvas';
+import SimpleTextCanvas from './components/SimpleTextCanvas';
 import PreviewPane from './components/PreviewPane';
 import { PPTXImportDialog } from './components/PPTXImportDialog';
 
@@ -26,12 +28,45 @@ import AccessibilitySettings from './components/AccessibilitySettings';
 import './App.css';
 
 function App() {
+  console.log('🚀 [App] ===== APP COMPONENT RENDERING =====');
+  console.log('🚀 [App] Fabric.js version check:', {
+    hasFabric: typeof fabric !== 'undefined',
+    fabricVersion: typeof fabric !== 'undefined' ? fabric.version : 'not loaded'
+  });
+  console.log('🚀 [App] ===== APP COMPONENT RENDERING =====');
+  console.log('🚀 [App] Environment info:', {
+    userAgent: navigator.userAgent,
+    platform: navigator.platform,
+    language: navigator.language,
+    onLine: navigator.onLine,
+    cookieEnabled: navigator.cookieEnabled,
+    location: window.location.href,
+    hasElectronAPI: !!window.electronAPI,
+    electronAPIKeys: window.electronAPI ? Object.keys(window.electronAPI) : 'none'
+  });
+  
   const dispatch = useDispatch();
   const presentation = useSelector((state: RootState) => state.presentation.currentPresentation);
   const currentSlideId = useSelector((state: RootState) => state.presentation.currentSlideId);
   const currentSlide = presentation?.slides.find((slide) => slide.id === currentSlideId);
   const showSettings = useSelector((state: RootState) => state.ui.showSettingsDialog);
   const accessibilitySettings = useSelector((state: RootState) => state.ui.accessibility);
+  
+  console.log('📊 [App] Redux state:', {
+    hasPresentation: !!presentation,
+    presentationTitle: presentation?.title,
+    slideCount: presentation?.slides.length || 0,
+    currentSlideId,
+    hasCurrentSlide: !!currentSlide,
+    currentSlideTitle: currentSlide?.title,
+    showSettings,
+    accessibilitySettings: {
+      announceChanges: accessibilitySettings.announceChanges,
+      highContrastMode: accessibilitySettings.highContrastMode,
+      keyboardNavigation: accessibilitySettings.keyboardNavigation,
+      screenReaderSupport: accessibilitySettings.screenReaderSupport
+    }
+  });
   
   // State for dialogs
   const [isPPTXImportDialogOpen, setIsPPTXImportDialogOpen] = useState(false);
@@ -297,6 +332,8 @@ function App() {
 
   // Accessibility handler functions
   const handleAddTextElement = useCallback(() => {
+    console.log('🎯 [App] ===== HANDLE ADD TEXT ELEMENT =====');
+    console.log('🎯 [App] Text element handler called from accessibility service');
     // This will be called by the accessibility service
     // For now, we'll trigger the same action as Ctrl+T in SlideCanvas
     accessibilityService.announce('Add text element shortcut triggered');
@@ -424,7 +461,7 @@ function App() {
           <div className="editor-content">
             {currentSlide ? (
               <div className="slide-editor">
-                <SlideCanvas 
+                <SimpleTextCanvas 
                   slideId={currentSlide.id}
                   width={presentation?.settings.slideSize.width || 800}
                   height={presentation?.settings.slideSize.height || 600}
