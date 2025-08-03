@@ -1,11 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { fabric } from 'fabric';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
-import { addElement, updateElement, moveElement, markAsModified } from '../store/slices/presentationSlice';
-import { SlideElement, Position } from '../types/presentation';
+import { addElement, updateElement } from '../store/slices/presentationSlice';
+import { SlideElement } from '../types/presentation';
 import { latexGenerationService } from '../services/latexGenerationService';
-import { previewService } from '../services/previewService';
+import MainToolbar from './MainToolbar';
+import TextFormattingToolbar from './TextFormattingToolbar';
+import './SimpleTextCanvas.css';
 
 interface SimpleTextCanvasProps {
   slideId: string;
@@ -25,16 +27,49 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
   const [isCanvasReady, setIsCanvasReady] = useState(false);
+  const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   
   // Get current slide data from Redux store
   const presentation = useSelector((state: RootState) => state.presentation.currentPresentation);
   const currentSlide = presentation?.slides.find(slide => slide.id === slideId);
+  const { activeTool } = useSelector((state: RootState) => state.ui);
   
   console.log('🔥 [SimpleTextCanvas] Redux state:', {
     hasPresentation: !!presentation,
     hasCurrentSlide: !!currentSlide,
     slideElementsCount: currentSlide?.elements?.length || 0
   });
+
+  // Function to add text at a specific position
+  const handleAddTextAtPosition = useCallback((x: number, y: number) => {
+    console.log('📝 [SimpleTextCanvas] ===== ADDING TEXT AT POSITION =====');
+    console.log('📝 [SimpleTextCanvas] Position:', { x, y });
+
+    const newElement: SlideElement = {
+      id: `element-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      type: 'text',
+      content: 'New Text',
+      position: { x, y },
+      size: { width: 200, height: 40 },
+      properties: {
+        fontSize: 16,
+        fontFamily: 'Arial',
+        textColor: { r: 0, g: 0, b: 0, a: 1 }
+      },
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    console.log('📝 [SimpleTextCanvas] Creating new text element:', newElement);
+
+    // Add to Redux store
+    dispatch(addElement({
+      slideId,
+      element: newElement
+    }));
+
+    console.log('✅ [SimpleTextCanvas] Element dispatched to Redux');
+  }, [slideId, dispatch]);
 
   // Initialize Fabric.js canvas
   useEffect(() => {
@@ -59,25 +94,62 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
       fabricCanvasRef.current = canvas;
       setIsCanvasReady(true);
 
-      // Add basic event handlers
+      // Add enhanced event handlers
       canvas.on('selection:created', (e) => {
         const selectedObject = e.selected?.[0];
         console.log('🎯 [SimpleTextCanvas] Object selected:', selectedObject?.type);
-      });
-
-      canvas.on('mouse:dblclick', (e) => {
-        console.log('🖱️ [SimpleTextCanvas] Double click detected');
-        const target = e.target;
-        if (target && target.type === 'textbox') {
-          console.log('🖱️ [SimpleTextCanvas] Double clicked on textbox, entering edit mode');
-          const textbox = target as fabric.Textbox;
-          textbox.enterEditing();
-          textbox.selectAll();
+        if (selectedObject?.data?.elementId) {
+          setSelectedElementId(selectedObject.data.elementId);
         }
       });
 
-      // CRITICAL: Add text editing event handlers to sync with Redux
+      canvas.on('selection:cleared', (e) => {
+        console.log('� [SimpleTextCanvas] ===== SELECTION CLEARED =====');
+        console.log('🔄 [SimpleTextCanvas] Previously selected objects:', e.deselected?.length || 0);
+        setSelectedElementId(null);
+        
+        // Update any deselected textboxes in Redux (this triggers LaTeX generation)
+        if (e.deselected && e.deselected.length > 0) {
+          e.deselected.forEach((obj) => {
+            if (obj.type === 'textbox' && obj.data?.elementId) {
+              const textbox = obj as fabric.Textbox;
+              console.log('� [SimpleTextCanvas] Updating deselected textbox (will trigger LaTeX after delay):', {
+                elementId: obj.data.elementId,
+                content: textbox.text,
+                position: { x: textbox.left, y: textbox.top }
+              });
+              
+              dispatch(updateElement({
+                slideId,
+                elementId: obj.data.elementId,
+                updates: { 
+                  content: textbox.text,
+                  position: { x: textbox.left || 0, y: textbox.top || 0 }
+                }
+              }));
+              
+              console.log('✅ [SimpleTextCanvas] Deselected object updated in Redux');
+              console.log('🔥 [SimpleTextCanvas] LaTeX generation scheduled');
+            }
+          });
+        }
+      });
+
+      // Handle canvas clicks for tool functionality
+      canvas.on('mouse:down', (e) => {
+        if (!e.target && activeTool === 'text') {
+          // Add text at click location when text tool is active
+          const pointer = canvas.getPointer(e.e);
+          handleAddTextAtPosition(pointer.x, pointer.y);
+        }
+      });
+
+      canvas.on('text:editing:entered', () => {
+        // Text editing started
+      });
+
       canvas.on('text:editing:exited', (e) => {
+        // Text editing ended
         console.log('🔄 [SimpleTextCanvas] ===== TEXT EDITING EXITED =====');
         const target = e.target;
         if (target && target.data?.elementId) {
@@ -194,7 +266,7 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
     } catch (error) {
       console.error('❌ [SimpleTextCanvas] Error creating canvas:', error);
     }
-  }, [width, height, dispatch, slideId]);
+  }, [width, height, dispatch, slideId, activeTool, handleAddTextAtPosition]);
 
   // Load slide elements into canvas
   useEffect(() => {
@@ -432,6 +504,27 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
   
   return (
     <div className="simple-text-canvas-container" style={{ border: '2px solid #000', padding: '10px' }}>
+      {/* Main Toolbar */}
+      <MainToolbar />
+      
+      {/* Text Formatting Toolbar - only show when text tool is active or element is selected */}
+      {(activeTool === 'text' || selectedElementId) && selectedElementId && (
+        <TextFormattingToolbar 
+          slideId={slideId}
+          elementId={selectedElementId}
+          currentProperties={currentSlide?.elements?.find(el => el.id === selectedElementId)?.properties || {}}
+          onPropertyChange={(properties) => {
+            if (selectedElementId) {
+              dispatch(updateElement({
+                slideId,
+                elementId: selectedElementId,
+                updates: { properties }
+              }));
+            }
+          }}
+        />
+      )}
+      
       <div className="canvas-toolbar" style={{ marginBottom: '10px', padding: '10px', backgroundColor: '#f0f0f0' }}>
         <button 
           onClick={addTextElement} 

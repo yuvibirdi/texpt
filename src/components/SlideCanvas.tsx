@@ -2,18 +2,13 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { fabric } from 'fabric';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
-import {
-  addElement,
-  deleteElement,
-  moveElement,
-  resizeElement,
-  updateElement,
-  updateElementProperties,
-} from '../store/slices/presentationSlice';
+import { addElement, deleteElement, moveElement, resizeElement, updateElement, updateElementProperties } from '../store/slices/presentationSlice';
+import { setActiveTool } from '../store/slices/uiSlice';
 import { SlideElement, Position, Size, ElementProperties } from '../types/presentation';
 import TextFormattingToolbar from './TextFormattingToolbar';
 import ImageImportDialog from './ImageImportDialog';
 import ImageEditingToolbar from './ImageEditingToolbar';
+import MainToolbar from './MainToolbar';
 import { parseMathContent, renderMathToHTML, containsMath } from '../utils/mathRenderer';
 import { validateImageFile, convertImageForLatex, getImageInfo, ImageInfo } from '../utils/imageUtils';
 import { createFabricShape, fabricObjectToSlideElement, ShapeDrawingState } from '../utils/shapeUtils';
@@ -52,9 +47,19 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
     pendingCount: number;
   }>({ isGenerating: false, pendingCount: 0 });
 
-  // Add logging for isTextEditing state changes
+  // Add logging for isTextEditing state changes and safety timeout
   useEffect(() => {
     console.log('🔄 isTextEditing state changed to:', isTextEditing);
+    
+    // Safety mechanism: if isTextEditing is stuck as true for too long, reset it
+    if (isTextEditing) {
+      const timeoutId = setTimeout(() => {
+        console.log('⚠️ [SlideCanvas] isTextEditing has been true for 10 seconds, resetting to false');
+        setIsTextEditing(false);
+      }, 10000); // 10 second timeout
+      
+      return () => clearTimeout(timeoutId);
+    }
   }, [isTextEditing]);
   const [selectedElementProperties, setSelectedElementProperties] = useState<ElementProperties>({});
 
@@ -75,6 +80,46 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
 
   // Register keyboard shortcuts for canvas context
   useKeyboardShortcuts('canvas', [
+    {
+      key: 'v',
+      description: 'Select tool',
+      action: () => {
+        dispatch(setActiveTool('select'));
+        announceAction('Select tool activated');
+      }
+    },
+    {
+      key: 't',
+      description: 'Text tool',
+      action: () => {
+        dispatch(setActiveTool('text'));
+        announceAction('Text tool activated');
+      }
+    },
+    {
+      key: 's',
+      description: 'Shape tool',
+      action: () => {
+        dispatch(setActiveTool('shape'));
+        announceAction('Shape tool activated');
+      }
+    },
+    {
+      key: 'i',
+      description: 'Image tool',
+      action: () => {
+        dispatch(setActiveTool('image'));
+        announceAction('Image tool activated');
+      }
+    },
+    {
+      key: 'd',
+      description: 'Draw tool',
+      action: () => {
+        dispatch(setActiveTool('draw'));
+        announceAction('Draw tool activated');
+      }
+    },
     {
       key: 't',
       ctrlKey: true,
@@ -616,6 +661,18 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
         return;
       }
 
+      // Handle text tool - add text at click position
+      if (activeTool === 'text' && !opt.target) {
+        addTextElementAtPosition(pointer.x, pointer.y);
+        return;
+      }
+
+      // Handle image tool - show import dialog
+      if (activeTool === 'image' && !opt.target) {
+        setShowImageImportDialog(true);
+        return;
+      }
+
       // Handle shape drawing
       if (activeTool === 'shape' && activeShapeType && !opt.target) {
         setShapeDrawingState({
@@ -736,7 +793,7 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
 
     // Note: Keyboard events will be handled at the component level
     // since Fabric.js keyboard events have limited browser support
-  }, [handleObjectMoving, handleObjectMoved, currentSlide?.elements, isTextEditing, dispatch, slideId, activeTool, activeShapeType, isPanning, lastPanPoint, shapeDrawingState.isDrawing, shapeDrawingState.startPoint, shapeDrawingState.currentShape]);
+  }, [handleObjectMoving, handleObjectMoved, currentSlide?.elements, isTextEditing, dispatch, slideId, activeTool, activeShapeType, addTextElementAtPosition, isPanning, lastPanPoint, shapeDrawingState.isDrawing, shapeDrawingState.startPoint, shapeDrawingState.currentShape]);
 
   // Initialize Fabric.js canvas
   useEffect(() => {
@@ -827,19 +884,44 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
             position: { x: element.position.x, y: element.position.y },
             size: { width: element.size.width, height: element.size.height },
             fontSize: element.properties.fontSize || 16,
-            fontFamily: element.properties.fontFamily || 'Arial'
+            fontFamily: element.properties.fontFamily || 'Arial',
+            textColor: element.properties.textColor,
+            elementId: element.id
           });
 
+          // Ensure safe positioning (within canvas bounds)
+          const safeLeft = Math.max(0, Math.min(element.position.x, width - 50));
+          const safeTop = Math.max(0, Math.min(element.position.y, height - 30));
+          
+          // Ensure safe sizing (minimum dimensions)
+          const safeWidth = Math.max(50, element.size.width);
+          const safeHeight = Math.max(20, element.size.height);
+          
+          // Ensure safe font size
+          const safeFontSize = Math.max(8, element.properties.fontSize || 16);
+          
+          // Ensure visible text color (not white on white background)
+          let textColor = '#000000'; // Default to black
+          if (element.properties.textColor) {
+            const { r, g, b, a = 1 } = element.properties.textColor;
+            // If color is too light (close to white), use black instead
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            if (brightness > 200 && a > 0.8) {
+              console.log('⚠️ [SlideCanvas] Text color too light, using black instead');
+              textColor = '#000000';
+            } else {
+              textColor = `rgba(${r}, ${g}, ${b}, ${a})`;
+            }
+          }
+
           fabricObject = new fabric.Textbox(textContent, {
-            left: element.position.x,
-            top: element.position.y,
-            width: element.size.width,
-            height: element.size.height,
-            fontSize: element.properties.fontSize || 16,
+            left: safeLeft,
+            top: safeTop,
+            width: safeWidth,
+            height: safeHeight,
+            fontSize: safeFontSize,
             fontFamily: element.properties.fontFamily || 'Arial',
-            fill: element.properties.textColor ?
-              `rgba(${element.properties.textColor.r}, ${element.properties.textColor.g}, ${element.properties.textColor.b}, ${element.properties.textColor.a || 1})` :
-              '#000000',
+            fill: textColor,
             fontWeight: element.properties.fontWeight || 'normal',
             fontStyle: element.properties.fontStyle || 'normal',
             textAlign: element.properties.textAlign || 'left',
@@ -849,6 +931,27 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
             evented: true,
             // Fix potential focus issues
             isEditing: false,
+            // Ensure visibility
+            visible: true,
+            opacity: Math.max(0.1, element.properties.opacity || 1), // Minimum 10% opacity
+            // Add a subtle background for better visibility during testing
+            backgroundColor: element.content === 'Type your text here' ? 'rgba(255, 255, 0, 0.1)' : 'transparent',
+          });
+
+          console.log('✅ [SlideCanvas] Textbox created successfully:', {
+            elementId: element.id,
+            fabricObjectType: fabricObject.type,
+            left: fabricObject.left,
+            top: fabricObject.top,
+            width: fabricObject.width,
+            height: fabricObject.height,
+            fontSize: (fabricObject as fabric.Textbox).fontSize,
+            fill: (fabricObject as fabric.Textbox).fill,
+            visible: fabricObject.visible,
+            opacity: fabricObject.opacity,
+            editable: (fabricObject as fabric.Textbox).editable,
+            selectable: fabricObject.selectable,
+            evented: fabricObject.evented
           });
         }
         break;
@@ -904,9 +1007,32 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
         fabricObject.angle = element.properties.rotation;
       }
 
+      console.log('➕ [SlideCanvas] Adding fabric object to canvas:', {
+        elementId: element.id,
+        elementType: element.type,
+        fabricType: fabricObject.type,
+        position: { left: fabricObject.left, top: fabricObject.top },
+        size: { width: fabricObject.width, height: fabricObject.height },
+        visible: fabricObject.visible,
+        opacity: fabricObject.opacity,
+        canvasObjectCountBefore: canvas.getObjects().length
+      });
+
       canvas.add(fabricObject);
+      
+      console.log('✅ [SlideCanvas] Fabric object added successfully:', {
+        elementId: element.id,
+        canvasObjectCountAfter: canvas.getObjects().length,
+        objectIndex: canvas.getObjects().indexOf(fabricObject)
+      });
+    } else {
+      console.error('❌ [SlideCanvas] Failed to create fabric object for element:', {
+        elementId: element.id,
+        elementType: element.type,
+        elementContent: element.content
+      });
     }
-  }, []);
+  }, [height, width]);
 
   // Load slide elements into canvas
   useEffect(() => {
@@ -914,11 +1040,20 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
 
     const canvas = fabricCanvasRef.current;
 
-    // Don't update canvas if user is currently editing text
-    if (isTextEditing) {
-      console.log('🚫 [SlideCanvas] Skipping canvas update - user is editing text');
+    // Only skip canvas update if user is actively editing AND we have existing objects
+    // This prevents the issue where isTextEditing gets stuck and blocks new textboxes
+    const hasExistingObjects = canvas.getObjects().length > 0;
+    if (isTextEditing && hasExistingObjects) {
+      console.log('🚫 [SlideCanvas] Skipping canvas update - user is editing existing text');
       return;
     }
+
+    console.log('🔄 [SlideCanvas] Loading slide elements into canvas:', {
+      isTextEditing,
+      hasExistingObjects,
+      elementCount: currentSlide.elements.length,
+      canvasObjectCount: canvas.getObjects().length
+    });
 
     // Clear existing objects
     canvas.clear();
@@ -1417,6 +1552,9 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
 
   return (
     <div className="slide-canvas-container">
+      {/* Main Toolbar */}
+      <MainToolbar />
+      
       <div className="canvas-toolbar">
         <button
           onClick={addTextElement}

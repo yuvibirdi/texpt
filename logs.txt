@@ -1,0 +1,1255 @@
+
+> latex-presentation-editor@1.0.0 electron
+> electron .
+
+🏭 [LaTeX Compiler Factory] ===== STARTING COMPILER SELECTION =====
+🏭 [LaTeX Compiler Factory] Environment detection: {
+  isNode: '18.16.1',
+  isBrowser: false,
+  isElectron: null,
+  hasRequire: true,
+  hasGlobal: true,
+  hasModule: true,
+  processVersions: {
+    node: '18.16.1',
+    acorn: '8.8.2',
+    ada: '1.0.4',
+    ares: '1.19.1',
+    brotli: '1.0.9',
+    cldr: '43.0',
+    icu: '73.1',
+    llhttp: '6.0.11',
+    modules: '116',
+    napi: '8',
+    nghttp2: '1.52.0',
+    openssl: '1.1.1',
+    simdutf: '3.2.2',
+    tz: '2023c',
+    undici: '5.21.0',
+    unicode: '15.0',
+    uv: '1.44.2',
+    uvwasi: '0.0.15',
+    v8: '11.6.189.22-electron.0',
+    zlib: '1.2.13.1-motley',
+    electron: '26.6.10',
+    chrome: '116.0.5845.228'
+  },
+  electronAPI: 'not available',
+  userAgent: 'undefined',
+  location: 'undefined'
+}
+🏭 [LaTeX Compiler Factory] Detected Node.js environment, attempting to load Node.js LaTeX compiler...
+✅ [LaTeX Compiler Factory] Successfully loaded Node.js LaTeX compiler
+🖥️ [Electron Main] Loading React app from: file:///Users/yb/git/texpt/build/index.html
+🖥️ [Electron Main] __dirname: /Users/yb/git/texpt/build/electron/electron
+🖥️ [Electron Main] Resolved path: /Users/yb/git/texpt/build/index.html
+electron-reload not available - hot reload disabled
+🖥️ [Renderer Console] Cleaned up orphaned backup: backup-1753281979606-x7qt2earq
+🖥️ [Renderer Console] Cleaned up orphaned backup: metadata
+🖥️ [Renderer Console] 🏭 [LaTeX Compiler Factory] ===== STARTING COMPILER SELECTION =====
+🖥️ [Renderer Console] 🏭 [LaTeX Compiler Factory] Environment detection: [object Object]
+🖥️ [Renderer Console] 🏭 [LaTeX Compiler Factory] Window object analysis: [object Object]
+🖥️ [Renderer Console] 🏭 [LaTeX Compiler Factory] Detected Electron environment, checking API...
+🖥️ [Renderer Console] 🏭 [LaTeX Compiler Factory] Electron API methods: openFile,saveFile,compileLatex,cancelLatexJob,getLatexQueueStatus,clearLatexQueue,checkLatexAvailability,minimizeWindow,maximizeWindow,closeWindow,isWindowMaximized,getAppVersion,getAppName,getPlatform,exportSaveFile,exportWriteFile,exportWriteFileBuffer,exportGetFileStats,reportError,onMenuAction,onLatexProgress,onLatexJobCompleted,onLatexJobCancelled,removeAllListeners
+🖥️ [Renderer Console] 🏭 [LaTeX Compiler Factory] Electron API has compileLatex method, loading Electron compiler...
+🖥️ [Renderer Console] ✅ [LaTeX Compiler Factory] Successfully loaded Electron LaTeX compiler
+🖥️ [Renderer Console] 🔥 [INDEX] ===== INDEX.TSX LOADING =====
+🖥️ [Renderer Console] 🔥 [INDEX] React version: 18.3.1
+🖥️ [Renderer Console] 🔥 [INDEX] Fabric version: 5.5.2
+🖥️ [Renderer Console] 🔍 [DEBUG] Fabric.js Textbox debugging enabled
+🖥️ [Renderer Console] 🔥 [INDEX] Creating React root...
+🖥️ [Renderer Console] 🔥 [INDEX] Rendering React app...
+🖥️ [Renderer Console] 🔥 [INDEX] React app render called
+🖥️ [Electron Main] Page finished loading
+🖥️ [Renderer Console] 🚀 [App] ===== APP COMPONENT RENDERING =====
+🖥️ [Renderer Console] 🚀 [App] Fabric.js version check: [object Object]
+🖥️ [Renderer Console] 🚀 [App] ===== APP COMPONENT RENDERING =====
+🖥️ [Renderer Console] 🚀 [App] Environment info: [object Object]
+🖥️ [Renderer Console] 📊 [App] Redux state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== COMPONENT MOUNTING =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Props: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Redux state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== RENDERING COMPONENT =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] %cElectron Security Warning (Disabled webSecurity) font-weight: bold; This renderer process has "webSecurity" disabled. This
+  exposes users of this app to severe security risks.
+
+For more information and help, consult
+https://electronjs.org/docs/tutorial/security.
+This warning will not show up
+once the app is packaged.
+🖥️ [Renderer Console] %cElectron Security Warning (allowRunningInsecureContent) font-weight: bold; This renderer process has "allowRunningInsecureContent"
+  enabled. This exposes users of this app to severe security risks.
+
+  
+For more information and help, consult
+https://electronjs.org/docs/tutorial/security.
+This warning will not show up
+once the app is packaged.
+🖥️ [Renderer Console] %cElectron Security Warning (Insecure Content-Security-Policy) font-weight: bold; This renderer process has either no Content Security
+  Policy set or a policy with "unsafe-eval" enabled. This exposes users of
+  this app to unnecessary security risks.
+
+For more information and help, consult
+https://electronjs.org/docs/tutorial/security.
+This warning will not show up
+once the app is packaged.
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== INITIALIZING CANVAS =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Canvas ref: true
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Fabric canvas created successfully
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== LOADING SLIDE ELEMENTS =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Canvas ready: false
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Current slide: true
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Elements count: 0
+🖥️ [Renderer Console] ⏸️ [SimpleTextCanvas] Skipping element loading - not ready
+🖥️ [Renderer Console] 🎣 [usePreview] ===== STARTING LATEX AVAILABILITY CHECK =====
+🖥️ [Renderer Console] 🎣 [usePreview] Current state: [object Object]
+🖥️ [Renderer Console] 🎣 [usePreview] Calling previewService.checkLatexAvailability()...
+🖥️ [Renderer Console] 🔧 [Preview Service] ===== STARTING LATEX AVAILABILITY CHECK =====
+🖥️ [Renderer Console] 🔧 [Preview Service] LaTeX compiler instance: [object Object]
+🖥️ [Renderer Console] 🔧 [Preview Service] Calling latexCompiler.checkLatexAvailability()...
+🖥️ [Renderer Console] ⚡ [LaTeX Compiler Electron] ===== STARTING LATEX AVAILABILITY CHECK =====
+🖥️ [Renderer Console] ⚡ [LaTeX Compiler Electron] ElectronAPI is available, checking methods...
+🖥️ [Renderer Console] ⚡ [LaTeX Compiler Electron] ElectronAPI methods: openFile,saveFile,compileLatex,cancelLatexJob,getLatexQueueStatus,clearLatexQueue,checkLatexAvailability,minimizeWindow,maximizeWindow,closeWindow,isWindowMaximized,getAppVersion,getAppName,getPlatform,exportSaveFile,exportWriteFile,exportWriteFileBuffer,exportGetFileStats,reportError,onMenuAction,onLatexProgress,onLatexJobCompleted,onLatexJobCancelled,removeAllListeners
+🖥️ [Renderer Console] ⚡ [LaTeX Compiler Electron] checkLatexAvailability type: function
+🖥️ [Renderer Console] ⚡ [LaTeX Compiler Electron] Calling electronAPI.checkLatexAvailability()...
+🖥️ [Electron Main] ===== LATEX AVAILABILITY IPC HANDLER =====
+🖥️ [Electron Main] Received latex:checkAvailability IPC call
+🖥️ [Electron Main] LaTeX compiler instance: {
+  exists: true,
+  type: 'LaTeXCompilerNode',
+  methods: [
+    'constructor',
+    'compile',
+    'cancelJob',
+    'getQueueStatus',
+    'clearQueue',
+    'checkLatexAvailability',
+    'processQueue',
+    'processJob',
+    'runLatexCompilation',
+    'getCompilerPath',
+    'runCommand',
+    'processCompilationResult',
+    'parseLatexLog',
+    'getContextLines',
+    'needsAnotherRun',
+    'emitProgress',
+    'generateJobId',
+    'sortQueue',
+    'startQueueProcessor',
+    'ensureTempDirectory',
+    'cleanupJobFiles',
+    'fileExists',
+    'cleanup'
+  ]
+}
+🖥️ [Electron Main] Calling latexCompilerInstance.checkLatexAvailability()...
+🔍 [LaTeX Compiler Node] ===== STARTING LATEX AVAILABILITY CHECK =====
+🔍 [LaTeX Compiler Node] Process info: {
+  platform: 'darwin',
+  arch: 'arm64',
+  nodeVersion: 'v18.16.1',
+  cwd: '/Users/yb/git/texpt',
+  env: {
+    PATH: '/Users/yb/git/texpt/node_modules/.bin:/Users/yb/git/node_modules/.bin:/Users/yb/node_modules/.bin:/Users/node_modules/.bin:/node_modules/.bin:/opt/homebrew/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/node-gyp-bin:/Users/yb/.spicetify:/Library/TeX/texbin:/Users/yb/go/bin:/opt/homebrew/opt/llvm/bin:/Users/yb/.local/bin:/Users/yb/Applications:/Users/yb/.cargo/bin:/opt/homebrew/sbin:/opt/homebrew/bin:/Users/yb/.bun/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin...',
+    HOME: '/Users/yb',
+    USER: 'yb',
+    SHELL: '/opt/homebrew/bin/fish'
+  }
+}
+🔍 [LaTeX Compiler Node] Checking compiler paths: {
+  pdflatex: [
+    '/Library/TeX/texbin/pdflatex',
+    '/usr/local/texlive/2023/bin/universal-darwin/pdflatex',
+    '/usr/local/texlive/2024/bin/universal-darwin/pdflatex',
+    '/usr/bin/pdflatex',
+    '/usr/local/bin/pdflatex',
+    'pdflatex'
+  ],
+  xelatex: [
+    '/Library/TeX/texbin/xelatex',
+    '/usr/local/texlive/2023/bin/universal-darwin/xelatex',
+    '/usr/local/texlive/2024/bin/universal-darwin/xelatex',
+    '/usr/bin/xelatex',
+    '/usr/local/bin/xelatex',
+    'xelatex'
+  ],
+  lualatex: [
+    '/Library/TeX/texbin/lualatex',
+    '/usr/local/texlive/2023/bin/universal-darwin/lualatex',
+    '/usr/local/texlive/2024/bin/universal-darwin/lualatex',
+    '/usr/bin/lualatex',
+    '/usr/local/bin/lualatex',
+    'lualatex'
+  ]
+}
+🔍 [LaTeX Compiler Node] ===== CHECKING PDFLATEX =====
+🔍 [LaTeX Compiler Node] Attempt 1/6 for pdflatex: /Library/TeX/texbin/pdflatex
+🔍 [LaTeX Compiler Node] File check for /Library/TeX/texbin/pdflatex: { exists: true, executable: true, mode: '100755' }
+🔍 [LaTeX Compiler Node] Running version check: /Library/TeX/texbin/pdflatex --version
+🖥️ [Renderer Console] All backups cleared
+🔍 [LaTeX Compiler Node] Version check result for /Library/TeX/texbin/pdflatex: {
+  success: true,
+  duration: '44ms',
+  stdoutLength: 538,
+  stderrLength: 0,
+  stdoutPreview: 'pdfTeX 3.141592653-2.6-1.40.27 (TeX Live 2025)\n' +
+    'kpathsea version 6.4.1\n' +
+    'Copyright 2025 Han The Thanh (pdfTeX) et al.\n' +
+    'There is NO warranty.  Redistribution of this software is\n' +
+    'covered by the terms of bot',
+  stderrPreview: ''
+}
+✅ [LaTeX Compiler Node] pdflatex is AVAILABLE via: /Library/TeX/texbin/pdflatex
+🔍 [LaTeX Compiler Node] Extracted version: 3.141592653
+🔍 [LaTeX Compiler Node] ===== CHECKING XELATEX =====
+🔍 [LaTeX Compiler Node] Attempt 1/6 for xelatex: /Library/TeX/texbin/xelatex
+🔍 [LaTeX Compiler Node] File check for /Library/TeX/texbin/xelatex: { exists: true, executable: true, mode: '100755' }
+🔍 [LaTeX Compiler Node] Running version check: /Library/TeX/texbin/xelatex --version
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== COMPONENT MOUNTING =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Props: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Redux state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== RENDERING COMPONENT =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] Intersection detected for thumbnail of slide slide-1753304629535
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== LOADING SLIDE ELEMENTS =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Canvas ready: true
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Current slide: true
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Elements count: 0
+🖥️ [Renderer Console] 🧹 [SimpleTextCanvas] Clearing existing objects
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] All elements loaded
+🔍 [LaTeX Compiler Node] Version check result for /Library/TeX/texbin/xelatex: {
+  success: true,
+  duration: '102ms',
+  stdoutLength: 791,
+  stderrLength: 0,
+  stdoutPreview: 'XeTeX 3.141592653-2.6-0.999997 (TeX Live 2025)\n' +
+    'kpathsea version 6.4.1\n' +
+    'Copyright 2025 SIL International, Jonathan Kew and Khaled Hosny.\n' +
+    'There is NO warranty.  Redistribution of this software is\n' +
+    'covered',
+  stderrPreview: ''
+}
+✅ [LaTeX Compiler Node] xelatex is AVAILABLE via: /Library/TeX/texbin/xelatex
+🔍 [LaTeX Compiler Node] ===== CHECKING LUALATEX =====
+🔍 [LaTeX Compiler Node] Attempt 1/6 for lualatex: /Library/TeX/texbin/lualatex
+🔍 [LaTeX Compiler Node] File check for /Library/TeX/texbin/lualatex: { exists: true, executable: true, mode: '100755' }
+🔍 [LaTeX Compiler Node] Running version check: /Library/TeX/texbin/lualatex --version
+🔍 [LaTeX Compiler Node] Version check result for /Library/TeX/texbin/lualatex: {
+  success: true,
+  duration: '46ms',
+  stdoutLength: 453,
+  stderrLength: 0,
+  stdoutPreview: 'This is LuaHBTeX, Version 1.21.0 (TeX Live 2025)\n' +
+    'Development id: 7667\n' +
+    '\n' +
+    "Execute  'luahbtex --credits'  for credits and version details.\n" +
+    '\n' +
+    'There is NO warranty. Redistribution of this software is covered',
+  stderrPreview: ''
+}
+✅ [LaTeX Compiler Node] lualatex is AVAILABLE via: /Library/TeX/texbin/lualatex
+🔍 [LaTeX Compiler Node] ===== SYSTEM DIAGNOSTICS =====
+🔍 [LaTeX Compiler Node] which pdflatex: { success: true, stdout: '/Library/TeX/texbin/pdflatex', stderr: '' }
+🔍 [LaTeX Compiler Node] whereis pdflatex: {
+  success: true,
+  stdout: 'pdflatex: /Library/TeX/texbin/pdflatex /Library/TeX/texbin/man/man1/pdftex.1',
+  stderr: ''
+}
+🔍 [LaTeX Compiler Node] ls /Library/TeX/texbin/: {
+  success: true,
+  stdout: 'lrwxr-xr-x  1 root  wheel  39 Jun 11 14:08 /Library/TeX/texbin/ -> ../.DefaultTeX/Contents/Programs/texbin\n',
+  stderr: ''
+}
+🔍 [LaTeX Compiler Node] ===== FINAL AVAILABILITY RESULT =====
+🔍 [LaTeX Compiler Node] Summary: {
+  available: true,
+  compilers: [ 'pdflatex', 'xelatex', 'lualatex' ],
+  version: '3.141592653'
+}
+🔍 [LaTeX Compiler Node] Detailed results: {
+  "pdflatex": {
+    "found": true,
+    "workingPath": "/Library/TeX/texbin/pdflatex",
+    "attempts": [
+      {
+        "path": "/Library/TeX/texbin/pdflatex",
+        "fileExists": true,
+        "executable": true,
+        "versionCheck": {
+          "success": true,
+          "duration": 44,
+          "stdoutLength": 538,
+          "stderrLength": 0,
+          "stdout": "pdfTeX 3.141592653-2.6-1.40.27 (TeX Live 2025)\nkpathsea version 6.4.1\nCopyright 2025 Han The Thanh (pdfTeX) et al.\nThere is NO warranty.  Redistribution of this software is\ncovered by the terms of both the pdfTeX copyright and\nthe Lesser GNU General Public License.\nFor more information about these m",
+          "stderr": ""
+        },
+        "error": null
+      }
+    ]
+  },
+  "xelatex": {
+    "found": true,
+    "workingPath": "/Library/TeX/texbin/xelatex",
+    "attempts": [
+      {
+        "path": "/Library/TeX/texbin/xelatex",
+        "fileExists": true,
+        "executable": true,
+        "versionCheck": {
+          "success": true,
+          "duration": 102,
+          "stdoutLength": 791,
+          "stderrLength": 0,
+          "stdout": "XeTeX 3.141592653-2.6-0.999997 (TeX Live 2025)\nkpathsea version 6.4.1\nCopyright 2025 SIL International, Jonathan Kew and Khaled Hosny.\nThere is NO warranty.  Redistribution of this software is\ncovered by the terms of both the XeTeX copyright and\nthe Lesser GNU General Public License.\nFor more inform",
+          "stderr": ""
+        },
+        "error": null
+      }
+    ]
+  },
+  "lualatex": {
+    "found": true,
+    "workingPath": "/Library/TeX/texbin/lualatex",
+    "attempts": [
+      {
+        "path": "/Library/TeX/texbin/lualatex",
+        "fileExists": true,
+        "executable": true,
+        "versionCheck": {
+          "success": true,
+          "duration": 46,
+          "stdoutLength": 453,
+          "stderrLength": 0,
+          "stdout": "This is LuaHBTeX, Version 1.21.0 (TeX Live 2025)\nDevelopment id: 7667\n\nExecute  'luahbtex --credits'  for credits and version details.\n\nThere is NO warranty. Redistribution of this software is covered by\nthe terms of the GNU General Public License, version 2 or (at your option)\nany later version. Fo",
+          "stderr": ""
+        },
+        "error": null
+      }
+    ]
+  }
+}
+🔍 [LaTeX Compiler Node] ===== END LATEX AVAILABILITY CHECK =====
+🖥️ [Electron Main] LaTeX availability check completed in 575 ms
+🖥️ [Electron Main] Availability result: {
+  available: true,
+  compilers: [ 'pdflatex', 'xelatex', 'lualatex' ],
+  version: '3.141592653'
+}
+🖥️ [Electron Main] Returning result to renderer: {
+  success: true,
+  available: true,
+  compilers: [ 'pdflatex', 'xelatex', 'lualatex' ],
+  version: '3.141592653'
+}
+🖥️ [Electron Main] ===== LATEX AVAILABILITY IPC HANDLER COMPLETE =====
+🖥️ [Renderer Console] ⚡ [LaTeX Compiler Electron] IPC call completed in 577 ms
+🖥️ [Renderer Console] ⚡ [LaTeX Compiler Electron] Raw result from main process: [object Object]
+🖥️ [Renderer Console] ✅ [LaTeX Compiler Electron] LaTeX availability check successful: [object Object]
+🖥️ [Renderer Console] ⚡ [LaTeX Compiler Electron] ===== LATEX AVAILABILITY CHECK COMPLETE =====
+🖥️ [Renderer Console] 🔧 [Preview Service] LaTeX availability check completed in 580 ms
+🖥️ [Renderer Console] 🔧 [Preview Service] Result from compiler: [object Object]
+🖥️ [Renderer Console] ✅ [Preview Service] LaTeX availability check successful
+🖥️ [Renderer Console] 🔧 [Preview Service] ===== LATEX AVAILABILITY CHECK COMPLETE =====
+🖥️ [Renderer Console] 🎣 [usePreview] LaTeX availability check completed in 581 ms
+🖥️ [Renderer Console] 🎣 [usePreview] Availability result: [object Object]
+🖥️ [Renderer Console] ✅ [usePreview] LaTeX is available with compilers: pdflatex,xelatex,lualatex
+🖥️ [Renderer Console] 🎣 [usePreview] ===== LATEX AVAILABILITY CHECK COMPLETE =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] 🔘 [SimpleTextCanvas] ===== TEXT BUTTON CLICKED =====
+🖥️ [Renderer Console] 🔘 [SimpleTextCanvas] Canvas ready: true
+🖥️ [Renderer Console] 🔘 [SimpleTextCanvas] Fabric canvas: true
+🖥️ [Renderer Console] 🔘 [SimpleTextCanvas] Slide ID: slide-1753304629535
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] Creating new text element: [object Object]
+🖥️ [Renderer Console] 🏪 [Redux] ===== ADD ELEMENT ACTION =====
+🖥️ [Renderer Console] 🏪 [Redux] Action payload: [object Object]
+🖥️ [Renderer Console] ✅ [Redux] Created new element: [object Object]
+🖥️ [Renderer Console] 📊 [Redux] Element added successfully, new count: 1
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Element dispatched to Redux
+🖥️ [Renderer Console] 🚀 [App] ===== APP COMPONENT RENDERING =====
+🖥️ [Renderer Console] 🚀 [App] Fabric.js version check: [object Object]
+🖥️ [Renderer Console] 🚀 [App] ===== APP COMPONENT RENDERING =====
+🖥️ [Renderer Console] 🚀 [App] Environment info: [object Object]
+🖥️ [Renderer Console] 📊 [App] Redux state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== COMPONENT MOUNTING =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Props: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Redux state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== RENDERING COMPONENT =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== LOADING SLIDE ELEMENTS =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Canvas ready: true
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Current slide: true
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Elements count: 1
+🖥️ [Renderer Console] 🧹 [SimpleTextCanvas] Clearing existing objects
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] Loading element 0: [object Object]
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] ===== CREATING TEXT ELEMENT =====
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] Element data: [object Object]
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Textbox created: [object Object]
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Textbox added to canvas
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] All elements loaded
+🖥️ [Renderer Console] [Preview Service] Starting compilation for presentation: New Presentation
+🖥️ [Renderer Console] [Preview Service] Presentation has 1 slides
+🖥️ [Renderer Console] [Preview Service] Setting compilation timeout with debounce: 500 ms
+🖥️ [Renderer Console] All backups cleared
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] Intersection detected for thumbnail of slide slide-1753304629535
+🖥️ [Renderer Console] [Preview Service] Starting actual compilation process
+🖥️ [Renderer Console] [Preview Service] Generating LaTeX source...
+🖥️ [Renderer Console] [Preview Service] Generated LaTeX source length: 1184
+🖥️ [Renderer Console] [Preview Service] LaTeX source preview: \documentclass[aspectratio=169,xcolor=dvipsnames,professionalfonts]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\definecolor{primary}{RGB}{59,130,246}
+\definecolor{secondary}{RGB}{107,114,128}
+\definecolor{accent}{RGB}{16,185,129}
+\definecolor{background}{RGB}{255,255,255}
+\definecolor{text}{RGB}{17,24,39}
+
+\setbea...
+🖥️ [Renderer Console] [Preview Service] Checking cache for single slide...
+🖥️ [Renderer Console] [Preview Service] Cache result: not found
+🖥️ [Renderer Console] [Preview Service] Starting fresh compilation with options: [object Object]
+[LaTeX Compiler Node] Creating compilation job job_1753304635404_1
+[LaTeX Compiler Node] Source length: 1184 characters
+[LaTeX Compiler Node] Source preview: \documentclass[aspectratio=169,xcolor=dvipsnames,professionalfonts]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\def...
+[LaTeX Compiler Node] Job options: {
+  compiler: 'pdflatex',
+  timeout: 30000,
+  includeAux: false,
+  shell: false,
+  synctex: true
+}
+[LaTeX Compiler Node] Added job to queue. Queue length: 1
+[LaTeX Compiler Node] Starting job processing for job_1753304635404_1
+[LaTeX Compiler Node] Added job job_1753304635404_1 to active jobs. Active count: 1
+[LaTeX Compiler Node] Creating temp directory: /var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job_1753304635404_1
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+[LaTeX Compiler Node] Writing LaTeX source to: /var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job_1753304635404_1/document.tex
+[LaTeX Compiler Node] Successfully wrote 1184 characters to file
+[LaTeX Compiler Node] Starting LaTeX compilation with pdflatex
+[LaTeX Compiler Node] Running LaTeX compilation with pdflatex
+[LaTeX Compiler Node] Compiler path: /Library/TeX/texbin/pdflatex
+[LaTeX Compiler Node] Compilation arguments: [
+  '-interaction=nonstopmode',
+  '-file-line-error',
+  '-output-directory=/var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job_1753304635404_1',
+  '-synctex=1',
+  '/var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job_1753304635404_1/document.tex'
+]
+[LaTeX Compiler Node] Starting compilation pass 1/3
+🖥️ [Renderer Console] [Preview Service] Compilation job started with ID: job_1753304635404_1
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] 🎯 [SimpleTextCanvas] Object selected: textbox
+🖥️ [Renderer Console] 🎯 [Fabric.Textbox] ===== ENTER EDITING CALLED =====
+🖥️ [Renderer Console] 🎯 [Fabric.Textbox] Textbox state: [object Object]
+🖥️ [Renderer Console] ✅ [Fabric.Textbox] Enter editing completed, new state: [object Object]
+🖥️ [Renderer Console] 🖱️ [SimpleTextCanvas] Double click detected
+🖥️ [Renderer Console] 🖱️ [SimpleTextCanvas] Double clicked on textbox, entering edit mode
+🖥️ [Renderer Console] 🎯 [Fabric.Textbox] ===== ENTER EDITING CALLED =====
+🖥️ [Renderer Console] 🎯 [Fabric.Textbox] Textbox state: [object Object]
+🖥️ [Renderer Console] ✅ [Fabric.Textbox] Enter editing completed, new state: [object Object]
+🖥️ [Renderer Console] 🎯 [Fabric.Textbox] ===== ENTER EDITING CALLED =====
+🖥️ [Renderer Console] 🎯 [Fabric.Textbox] Textbox state: [object Object]
+🖥️ [Renderer Console] ✅ [Fabric.Textbox] Enter editing completed, new state: [object Object]
+[LaTeX Compiler Node] Pass 1 completed: {
+  success: true,
+  stdoutLength: 15637,
+  stderrLength: 0,
+  stdoutPreview: 'This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex)\n' +
+    ' restricted \\write18 enabled.\n' +
+    'entering extended mode\n' +
+    '\n' +
+    '(/var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job\n' +
+    '_1753304635404_1/document.tex\n' +
+    'LaTeX2e <2024-11-01> patch level 2\n' +
+    'L3 programming layer <2025-01-18>\n' +
+    '(/usr/local/texlive/2025/texmf-dist/tex/latex/beamer/beamer.cls\n' +
+    'Document Class: beamer 2025/02/04 v3.72 A class for typesetting presentations\n' +
+    '(/usr/local/texlive/2025/texmf-di',
+  stderrPreview: ''
+}
+[LaTeX Compiler Node] Another run needed for references/citations
+[LaTeX Compiler Node] Starting compilation pass 2/3
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] 🎯 [Fabric.Textbox] ===== ENTER EDITING CALLED =====
+🖥️ [Renderer Console] 🎯 [Fabric.Textbox] Textbox state: [object Object]
+🖥️ [Renderer Console] ✅ [Fabric.Textbox] Enter editing completed, new state: [object Object]
+🖥️ [Renderer Console] 🖱️ [SimpleTextCanvas] Double click detected
+🖥️ [Renderer Console] 🖱️ [SimpleTextCanvas] Double clicked on textbox, entering edit mode
+🖥️ [Renderer Console] 🎯 [Fabric.Textbox] ===== ENTER EDITING CALLED =====
+🖥️ [Renderer Console] 🎯 [Fabric.Textbox] Textbox state: [object Object]
+🖥️ [Renderer Console] ✅ [Fabric.Textbox] Enter editing completed, new state: [object Object]
+🖥️ [Renderer Console] 🎯 [Fabric.Textbox] ===== ENTER EDITING CALLED =====
+🖥️ [Renderer Console] 🎯 [Fabric.Textbox] Textbox state: [object Object]
+🖥️ [Renderer Console] ✅ [Fabric.Textbox] Enter editing completed, new state: [object Object]
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] ===== TEXT CHANGED (REAL-TIME) =====
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] Real-time text update: [object Object]
+🖥️ [Renderer Console] 🚀 [App] ===== APP COMPONENT RENDERING =====
+🖥️ [Renderer Console] 🚀 [App] Fabric.js version check: [object Object]
+🖥️ [Renderer Console] 🚀 [App] ===== APP COMPONENT RENDERING =====
+🖥️ [Renderer Console] 🚀 [App] Environment info: [object Object]
+🖥️ [Renderer Console] 📊 [App] Redux state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== COMPONENT MOUNTING =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Props: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Redux state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== RENDERING COMPONENT =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== LOADING SLIDE ELEMENTS =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Canvas ready: true
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Current slide: true
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Elements count: 1
+🖥️ [Renderer Console] 🧹 [SimpleTextCanvas] Clearing existing objects
+🖥️ [Renderer Console] 🚪 [Fabric.Textbox] ===== EXIT EDITING CALLED =====
+🖥️ [Renderer Console] 🚪 [Fabric.Textbox] Textbox state before exit: [object Object]
+🖥️ [Renderer Console] 🔄 [SimpleTextCanvas] ===== TEXT EDITING EXITED =====
+🖥️ [Renderer Console] 🔄 [SimpleTextCanvas] Updating Redux with new text: [object Object]
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Text updated in Redux store
+🖥️ [Renderer Console] ✅ [Fabric.Textbox] Exit editing completed
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] Loading element 0: [object Object]
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] ===== CREATING TEXT ELEMENT =====
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] Element data: [object Object]
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Textbox created: [object Object]
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Textbox added to canvas
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] All elements loaded
+🖥️ [Renderer Console] [Preview Service] Starting compilation for presentation: New Presentation
+🖥️ [Renderer Console] [Preview Service] Presentation has 1 slides
+🖥️ [Renderer Console] [Preview Service] Clearing existing compilation timeout
+🖥️ [Renderer Console] [Preview Service] Cancelling existing job: job_1753304635404_1
+🖥️ [Renderer Console] [Preview Service] Setting compilation timeout with debounce: 500 ms
+🖥️ [Renderer Console] All backups cleared
+🖥️ [Renderer Console] 🚀 [App] ===== APP COMPONENT RENDERING =====
+🖥️ [Renderer Console] 🚀 [App] Fabric.js version check: [object Object]
+🖥️ [Renderer Console] 🚀 [App] ===== APP COMPONENT RENDERING =====
+🖥️ [Renderer Console] 🚀 [App] Environment info: [object Object]
+🖥️ [Renderer Console] 📊 [App] Redux state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== COMPONENT MOUNTING =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Props: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Redux state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== RENDERING COMPONENT =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== LOADING SLIDE ELEMENTS =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Canvas ready: true
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Current slide: true
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Elements count: 1
+🖥️ [Renderer Console] 🧹 [SimpleTextCanvas] Clearing existing objects
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] Loading element 0: [object Object]
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] ===== CREATING TEXT ELEMENT =====
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] Element data: [object Object]
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Textbox created: [object Object]
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Textbox added to canvas
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] All elements loaded
+🖥️ [Renderer Console] [Preview Service] Starting compilation for presentation: New Presentation
+🖥️ [Renderer Console] [Preview Service] Presentation has 1 slides
+🖥️ [Renderer Console] [Preview Service] Clearing existing compilation timeout
+🖥️ [Renderer Console] [Preview Service] Cancelling existing job: job_1753304635404_1
+🖥️ [Renderer Console] [Preview Service] Setting compilation timeout with debounce: 500 ms
+🖥️ [Renderer Console] All backups cleared
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] Intersection detected for thumbnail of slide slide-1753304629535
+🖥️ [Renderer Console] [Preview Service] Starting actual compilation process
+🖥️ [Renderer Console] [Preview Service] Generating LaTeX source...
+🖥️ [Renderer Console] [Preview Service] Generated LaTeX source length: 1167
+🖥️ [Renderer Console] [Preview Service] LaTeX source preview: \documentclass[aspectratio=169,xcolor=dvipsnames,professionalfonts]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\definecolor{primary}{RGB}{59,130,246}
+\definecolor{secondary}{RGB}{107,114,128}
+\definecolor{accent}{RGB}{16,185,129}
+\definecolor{background}{RGB}{255,255,255}
+\definecolor{text}{RGB}{17,24,39}
+
+\setbea...
+🖥️ [Renderer Console] [Preview Service] Checking cache for single slide...
+🖥️ [Renderer Console] [Preview Service] Cache result: not found
+🖥️ [Renderer Console] [Preview Service] Starting fresh compilation with options: [object Object]
+[LaTeX Compiler Node] Creating compilation job job_1753304638213_2
+[LaTeX Compiler Node] Source length: 1167 characters
+[LaTeX Compiler Node] Source preview: \documentclass[aspectratio=169,xcolor=dvipsnames,professionalfonts]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\def...
+[LaTeX Compiler Node] Job options: {
+  compiler: 'pdflatex',
+  timeout: 30000,
+  includeAux: false,
+  shell: false,
+  synctex: true
+}
+[LaTeX Compiler Node] Added job to queue. Queue length: 1
+[LaTeX Compiler Node] Starting job processing for job_1753304638213_2
+[LaTeX Compiler Node] Added job job_1753304638213_2 to active jobs. Active count: 2
+[LaTeX Compiler Node] Creating temp directory: /var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job_1753304638213_2
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+[LaTeX Compiler Node] Writing LaTeX source to: /var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job_1753304638213_2/document.tex
+🖥️ [Renderer Console] [Preview Service] Compilation job started with ID: job_1753304638213_2
+[LaTeX Compiler Node] Successfully wrote 1167 characters to file
+[LaTeX Compiler Node] Starting LaTeX compilation with pdflatex
+[LaTeX Compiler Node] Running LaTeX compilation with pdflatex
+[LaTeX Compiler Node] Compiler path: /Library/TeX/texbin/pdflatex
+[LaTeX Compiler Node] Compilation arguments: [
+  '-interaction=nonstopmode',
+  '-file-line-error',
+  '-output-directory=/var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job_1753304638213_2',
+  '-synctex=1',
+  '/var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job_1753304638213_2/document.tex'
+]
+[LaTeX Compiler Node] Starting compilation pass 1/3
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+[LaTeX Compiler Node] Pass 2 completed: {
+  success: true,
+  stdoutLength: 15769,
+  stderrLength: 0,
+  stdoutPreview: 'This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex)\n' +
+    ' restricted \\write18 enabled.\n' +
+    'entering extended mode\n' +
+    '\n' +
+    '(/var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job\n' +
+    '_1753304635404_1/document.tex\n' +
+    'LaTeX2e <2024-11-01> patch level 2\n' +
+    'L3 programming layer <2025-01-18>\n' +
+    '(/usr/local/texlive/2025/texmf-dist/tex/latex/beamer/beamer.cls\n' +
+    'Document Class: beamer 2025/02/04 v3.72 A class for typesetting presentations\n' +
+    '(/usr/local/texlive/2025/texmf-di',
+  stderrPreview: ''
+}
+[LaTeX Compiler Node] Compilation completed after 2 pass(es)
+[LaTeX Compiler Node] Compilation completed. Success: true
+[LaTeX Compiler Node] Stdout length: 15769, Stderr length: 0
+[LaTeX Compiler Node] Processing compilation results...
+[LaTeX Compiler Node] Final result - Success: true, Errors: 0, Warnings: 0
+[LaTeX Compiler Node] Cleaning up job job_1753304635404_1
+🖥️ [Renderer Console] [Preview Service] Compilation completed for job: job_1753304635404_1 Success: true
+🖥️ [Renderer Console] [Preview Service] Caching successful compilation result
+🖥️ [Renderer Console] [Preview Service] Compilation successful, resolving promise
+🖥️ [Renderer Console] 🎯 [SimpleTextCanvas] Object selected: textbox
+[LaTeX Compiler Node] Pass 1 completed: {
+  success: true,
+  stdoutLength: 15637,
+  stderrLength: 0,
+  stdoutPreview: 'This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex)\n' +
+    ' restricted \\write18 enabled.\n' +
+    'entering extended mode\n' +
+    '\n' +
+    '(/var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job\n' +
+    '_1753304638213_2/document.tex\n' +
+    'LaTeX2e <2024-11-01> patch level 2\n' +
+    'L3 programming layer <2025-01-18>\n' +
+    '(/usr/local/texlive/2025/texmf-dist/tex/latex/beamer/beamer.cls\n' +
+    'Document Class: beamer 2025/02/04 v3.72 A class for typesetting presentations\n' +
+    '(/usr/local/texlive/2025/texmf-di',
+  stderrPreview: ''
+}
+[LaTeX Compiler Node] Another run needed for references/citations
+[LaTeX Compiler Node] Starting compilation pass 2/3
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] 🎯 [Fabric.Textbox] ===== ENTER EDITING CALLED =====
+🖥️ [Renderer Console] 🎯 [Fabric.Textbox] Textbox state: [object Object]
+🖥️ [Renderer Console] ✅ [Fabric.Textbox] Enter editing completed, new state: [object Object]
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] ===== TEXT CHANGED (REAL-TIME) =====
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] Real-time text update: [object Object]
+🖥️ [Renderer Console] 🚀 [App] ===== APP COMPONENT RENDERING =====
+🖥️ [Renderer Console] 🚀 [App] Fabric.js version check: [object Object]
+🖥️ [Renderer Console] 🚀 [App] ===== APP COMPONENT RENDERING =====
+🖥️ [Renderer Console] 🚀 [App] Environment info: [object Object]
+🖥️ [Renderer Console] 📊 [App] Redux state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== COMPONENT MOUNTING =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Props: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Redux state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== RENDERING COMPONENT =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== LOADING SLIDE ELEMENTS =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Canvas ready: true
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Current slide: true
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Elements count: 1
+🖥️ [Renderer Console] 🧹 [SimpleTextCanvas] Clearing existing objects
+🖥️ [Renderer Console] 🚪 [Fabric.Textbox] ===== EXIT EDITING CALLED =====
+🖥️ [Renderer Console] 🚪 [Fabric.Textbox] Textbox state before exit: [object Object]
+🖥️ [Renderer Console] 🔄 [SimpleTextCanvas] ===== TEXT EDITING EXITED =====
+🖥️ [Renderer Console] 🔄 [SimpleTextCanvas] Updating Redux with new text: [object Object]
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Text updated in Redux store
+🖥️ [Renderer Console] ✅ [Fabric.Textbox] Exit editing completed
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] Loading element 0: [object Object]
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] ===== CREATING TEXT ELEMENT =====
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] Element data: [object Object]
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Textbox created: [object Object]
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Textbox added to canvas
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] All elements loaded
+🖥️ [Renderer Console] [Preview Service] Starting compilation for presentation: New Presentation
+🖥️ [Renderer Console] [Preview Service] Presentation has 1 slides
+🖥️ [Renderer Console] [Preview Service] Clearing existing compilation timeout
+🖥️ [Renderer Console] [Preview Service] Cancelling existing job: job_1753304638213_2
+🖥️ [Renderer Console] [Preview Service] Setting compilation timeout with debounce: 500 ms
+🖥️ [Renderer Console] All backups cleared
+🖥️ [Renderer Console] 🚀 [App] ===== APP COMPONENT RENDERING =====
+🖥️ [Renderer Console] 🚀 [App] Fabric.js version check: [object Object]
+🖥️ [Renderer Console] 🚀 [App] ===== APP COMPONENT RENDERING =====
+🖥️ [Renderer Console] 🚀 [App] Environment info: [object Object]
+🖥️ [Renderer Console] 📊 [App] Redux state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== COMPONENT MOUNTING =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Props: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Redux state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== RENDERING COMPONENT =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== LOADING SLIDE ELEMENTS =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Canvas ready: true
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Current slide: true
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Elements count: 1
+🖥️ [Renderer Console] 🧹 [SimpleTextCanvas] Clearing existing objects
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] Loading element 0: [object Object]
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] ===== CREATING TEXT ELEMENT =====
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] Element data: [object Object]
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Textbox created: [object Object]
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Textbox added to canvas
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] All elements loaded
+🖥️ [Renderer Console] [Preview Service] Starting compilation for presentation: New Presentation
+🖥️ [Renderer Console] [Preview Service] Presentation has 1 slides
+🖥️ [Renderer Console] [Preview Service] Clearing existing compilation timeout
+🖥️ [Renderer Console] [Preview Service] Cancelling existing job: job_1753304638213_2
+🖥️ [Renderer Console] [Preview Service] Setting compilation timeout with debounce: 500 ms
+🖥️ [Renderer Console] All backups cleared
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] Intersection detected for thumbnail of slide slide-1753304629535
+🖥️ [Renderer Console] [Preview Service] Starting actual compilation process
+🖥️ [Renderer Console] [Preview Service] Generating LaTeX source...
+🖥️ [Renderer Console] [Preview Service] Generated LaTeX source length: 1168
+🖥️ [Renderer Console] [Preview Service] LaTeX source preview: \documentclass[aspectratio=169,xcolor=dvipsnames,professionalfonts]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\definecolor{primary}{RGB}{59,130,246}
+\definecolor{secondary}{RGB}{107,114,128}
+\definecolor{accent}{RGB}{16,185,129}
+\definecolor{background}{RGB}{255,255,255}
+\definecolor{text}{RGB}{17,24,39}
+
+\setbea...
+🖥️ [Renderer Console] [Preview Service] Checking cache for single slide...
+🖥️ [Renderer Console] [Preview Service] Cache result: not found
+🖥️ [Renderer Console] [Preview Service] Starting fresh compilation with options: [object Object]
+[LaTeX Compiler Node] Creating compilation job job_1753304640803_3
+[LaTeX Compiler Node] Source length: 1168 characters
+[LaTeX Compiler Node] Source preview: \documentclass[aspectratio=169,xcolor=dvipsnames,professionalfonts]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\def...
+[LaTeX Compiler Node] Job options: {
+  compiler: 'pdflatex',
+  timeout: 30000,
+  includeAux: false,
+  shell: false,
+  synctex: true
+}
+[LaTeX Compiler Node] Added job to queue. Queue length: 1
+[LaTeX Compiler Node] Starting job processing for job_1753304640803_3
+[LaTeX Compiler Node] Added job job_1753304640803_3 to active jobs. Active count: 2
+[LaTeX Compiler Node] Creating temp directory: /var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job_1753304640803_3
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] [Preview Service] Compilation job started with ID: job_1753304640803_3
+[LaTeX Compiler Node] Writing LaTeX source to: /var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job_1753304640803_3/document.tex
+[LaTeX Compiler Node] Successfully wrote 1168 characters to file
+[LaTeX Compiler Node] Starting LaTeX compilation with pdflatex
+[LaTeX Compiler Node] Running LaTeX compilation with pdflatex
+[LaTeX Compiler Node] Compiler path: /Library/TeX/texbin/pdflatex
+[LaTeX Compiler Node] Compilation arguments: [
+  '-interaction=nonstopmode',
+  '-file-line-error',
+  '-output-directory=/var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job_1753304640803_3',
+  '-synctex=1',
+  '/var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job_1753304640803_3/document.tex'
+]
+[LaTeX Compiler Node] Starting compilation pass 1/3
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+[LaTeX Compiler Node] Pass 2 completed: {
+  success: true,
+  stdoutLength: 15769,
+  stderrLength: 0,
+  stdoutPreview: 'This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex)\n' +
+    ' restricted \\write18 enabled.\n' +
+    'entering extended mode\n' +
+    '\n' +
+    '(/var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job\n' +
+    '_1753304638213_2/document.tex\n' +
+    'LaTeX2e <2024-11-01> patch level 2\n' +
+    'L3 programming layer <2025-01-18>\n' +
+    '(/usr/local/texlive/2025/texmf-dist/tex/latex/beamer/beamer.cls\n' +
+    'Document Class: beamer 2025/02/04 v3.72 A class for typesetting presentations\n' +
+    '(/usr/local/texlive/2025/texmf-di',
+  stderrPreview: ''
+}
+[LaTeX Compiler Node] Compilation completed after 2 pass(es)
+[LaTeX Compiler Node] Compilation completed. Success: true
+[LaTeX Compiler Node] Stdout length: 15769, Stderr length: 0
+[LaTeX Compiler Node] Processing compilation results...
+[LaTeX Compiler Node] Final result - Success: true, Errors: 0, Warnings: 0
+[LaTeX Compiler Node] Cleaning up job job_1753304638213_2
+🖥️ [Renderer Console] [Preview Service] Compilation completed for job: job_1753304638213_2 Success: true
+🖥️ [Renderer Console] [Preview Service] Caching successful compilation result
+🖥️ [Renderer Console] [Preview Service] Compilation successful, resolving promise
+🖥️ [Renderer Console] 🎯 [SimpleTextCanvas] Object selected: textbox
+🖥️ [Renderer Console] 🎯 [Fabric.Textbox] ===== ENTER EDITING CALLED =====
+🖥️ [Renderer Console] 🎯 [Fabric.Textbox] Textbox state: [object Object]
+🖥️ [Renderer Console] ✅ [Fabric.Textbox] Enter editing completed, new state: [object Object]
+[LaTeX Compiler Node] Pass 1 completed: {
+  success: true,
+  stdoutLength: 15637,
+  stderrLength: 0,
+  stdoutPreview: 'This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex)\n' +
+    ' restricted \\write18 enabled.\n' +
+    'entering extended mode\n' +
+    '\n' +
+    '(/var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job\n' +
+    '_1753304640803_3/document.tex\n' +
+    'LaTeX2e <2024-11-01> patch level 2\n' +
+    'L3 programming layer <2025-01-18>\n' +
+    '(/usr/local/texlive/2025/texmf-dist/tex/latex/beamer/beamer.cls\n' +
+    'Document Class: beamer 2025/02/04 v3.72 A class for typesetting presentations\n' +
+    '(/usr/local/texlive/2025/texmf-di',
+  stderrPreview: ''
+}
+[LaTeX Compiler Node] Another run needed for references/citations
+[LaTeX Compiler Node] Starting compilation pass 2/3
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] ===== TEXT CHANGED (REAL-TIME) =====
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] Real-time text update: [object Object]
+🖥️ [Renderer Console] 🚀 [App] ===== APP COMPONENT RENDERING =====
+🖥️ [Renderer Console] 🚀 [App] Fabric.js version check: [object Object]
+🖥️ [Renderer Console] 🚀 [App] ===== APP COMPONENT RENDERING =====
+🖥️ [Renderer Console] 🚀 [App] Environment info: [object Object]
+🖥️ [Renderer Console] 📊 [App] Redux state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== COMPONENT MOUNTING =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Props: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Redux state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== RENDERING COMPONENT =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== LOADING SLIDE ELEMENTS =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Canvas ready: true
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Current slide: true
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Elements count: 1
+🖥️ [Renderer Console] 🧹 [SimpleTextCanvas] Clearing existing objects
+🖥️ [Renderer Console] 🚪 [Fabric.Textbox] ===== EXIT EDITING CALLED =====
+🖥️ [Renderer Console] 🚪 [Fabric.Textbox] Textbox state before exit: [object Object]
+🖥️ [Renderer Console] 🔄 [SimpleTextCanvas] ===== TEXT EDITING EXITED =====
+🖥️ [Renderer Console] 🔄 [SimpleTextCanvas] Updating Redux with new text: [object Object]
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Text updated in Redux store
+🖥️ [Renderer Console] ✅ [Fabric.Textbox] Exit editing completed
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] Loading element 0: [object Object]
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] ===== CREATING TEXT ELEMENT =====
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] Element data: [object Object]
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Textbox created: [object Object]
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Textbox added to canvas
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] All elements loaded
+🖥️ [Renderer Console] [Preview Service] Starting compilation for presentation: New Presentation
+🖥️ [Renderer Console] [Preview Service] Presentation has 1 slides
+🖥️ [Renderer Console] [Preview Service] Clearing existing compilation timeout
+🖥️ [Renderer Console] [Preview Service] Cancelling existing job: job_1753304640803_3
+🖥️ [Renderer Console] [Preview Service] Setting compilation timeout with debounce: 500 ms
+🖥️ [Renderer Console] All backups cleared
+🖥️ [Renderer Console] 🚀 [App] ===== APP COMPONENT RENDERING =====
+🖥️ [Renderer Console] 🚀 [App] Fabric.js version check: [object Object]
+🖥️ [Renderer Console] 🚀 [App] ===== APP COMPONENT RENDERING =====
+🖥️ [Renderer Console] 🚀 [App] Environment info: [object Object]
+🖥️ [Renderer Console] 📊 [App] Redux state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== COMPONENT MOUNTING =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Props: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Redux state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== RENDERING COMPONENT =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] ===== LOADING SLIDE ELEMENTS =====
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Canvas ready: true
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Current slide: true
+🖥️ [Renderer Console] 🔥 [SimpleTextCanvas] Elements count: 1
+🖥️ [Renderer Console] 🧹 [SimpleTextCanvas] Clearing existing objects
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] Loading element 0: [object Object]
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] ===== CREATING TEXT ELEMENT =====
+🖥️ [Renderer Console] 📝 [SimpleTextCanvas] Element data: [object Object]
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Textbox created: [object Object]
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] Textbox added to canvas
+🖥️ [Renderer Console] ✅ [SimpleTextCanvas] All elements loaded
+🖥️ [Renderer Console] [Preview Service] Starting compilation for presentation: New Presentation
+🖥️ [Renderer Console] [Preview Service] Presentation has 1 slides
+🖥️ [Renderer Console] [Preview Service] Clearing existing compilation timeout
+🖥️ [Renderer Console] [Preview Service] Cancelling existing job: job_1753304640803_3
+🖥️ [Renderer Console] [Preview Service] Setting compilation timeout with debounce: 500 ms
+🖥️ [Renderer Console] All backups cleared
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] Intersection detected for thumbnail of slide slide-1753304629535
+🖥️ [Renderer Console] [Preview Service] Starting actual compilation process
+🖥️ [Renderer Console] [Preview Service] Generating LaTeX source...
+🖥️ [Renderer Console] [Preview Service] Generated LaTeX source length: 1169
+🖥️ [Renderer Console] [Preview Service] LaTeX source preview: \documentclass[aspectratio=169,xcolor=dvipsnames,professionalfonts]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\definecolor{primary}{RGB}{59,130,246}
+\definecolor{secondary}{RGB}{107,114,128}
+\definecolor{accent}{RGB}{16,185,129}
+\definecolor{background}{RGB}{255,255,255}
+\definecolor{text}{RGB}{17,24,39}
+
+\setbea...
+🖥️ [Renderer Console] [Preview Service] Checking cache for single slide...
+🖥️ [Renderer Console] [Preview Service] Cache result: not found
+🖥️ [Renderer Console] [Preview Service] Starting fresh compilation with options: [object Object]
+[LaTeX Compiler Node] Creating compilation job job_1753304643503_4
+[LaTeX Compiler Node] Source length: 1169 characters
+[LaTeX Compiler Node] Source preview: \documentclass[aspectratio=169,xcolor=dvipsnames,professionalfonts]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\def...
+[LaTeX Compiler Node] Job options: {
+  compiler: 'pdflatex',
+  timeout: 30000,
+  includeAux: false,
+  shell: false,
+  synctex: true
+}
+[LaTeX Compiler Node] Added job to queue. Queue length: 1
+[LaTeX Compiler Node] Starting job processing for job_1753304643503_4
+[LaTeX Compiler Node] Added job job_1753304643503_4 to active jobs. Active count: 2
+[LaTeX Compiler Node] Creating temp directory: /var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job_1753304643503_4
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+[LaTeX Compiler Node] Writing LaTeX source to: /var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job_1753304643503_4/document.tex
+🖥️ [Renderer Console] [Preview Service] Compilation job started with ID: job_1753304643503_4
+[LaTeX Compiler Node] Successfully wrote 1169 characters to file
+[LaTeX Compiler Node] Starting LaTeX compilation with pdflatex
+[LaTeX Compiler Node] Running LaTeX compilation with pdflatex
+[LaTeX Compiler Node] Compiler path: /Library/TeX/texbin/pdflatex
+[LaTeX Compiler Node] Compilation arguments: [
+  '-interaction=nonstopmode',
+  '-file-line-error',
+  '-output-directory=/var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job_1753304643503_4',
+  '-synctex=1',
+  '/var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job_1753304643503_4/document.tex'
+]
+[LaTeX Compiler Node] Starting compilation pass 1/3
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+[LaTeX Compiler Node] Pass 2 completed: {
+  success: true,
+  stdoutLength: 15769,
+  stderrLength: 0,
+  stdoutPreview: 'This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex)\n' +
+    ' restricted \\write18 enabled.\n' +
+    'entering extended mode\n' +
+    '\n' +
+    '(/var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job\n' +
+    '_1753304640803_3/document.tex\n' +
+    'LaTeX2e <2024-11-01> patch level 2\n' +
+    'L3 programming layer <2025-01-18>\n' +
+    '(/usr/local/texlive/2025/texmf-dist/tex/latex/beamer/beamer.cls\n' +
+    'Document Class: beamer 2025/02/04 v3.72 A class for typesetting presentations\n' +
+    '(/usr/local/texlive/2025/texmf-di',
+  stderrPreview: ''
+}
+[LaTeX Compiler Node] Compilation completed after 2 pass(es)
+[LaTeX Compiler Node] Compilation completed. Success: true
+[LaTeX Compiler Node] Stdout length: 15769, Stderr length: 0
+[LaTeX Compiler Node] Processing compilation results...
+[LaTeX Compiler Node] Final result - Success: true, Errors: 0, Warnings: 0
+[LaTeX Compiler Node] Cleaning up job job_1753304640803_3
+🖥️ [Renderer Console] [Preview Service] Compilation completed for job: job_1753304640803_3 Success: true
+🖥️ [Renderer Console] [Preview Service] Caching successful compilation result
+🖥️ [Renderer Console] [Preview Service] Compilation successful, resolving promise
+🖥️ [Renderer Console] 🎯 [SimpleTextCanvas] Object selected: textbox
+[LaTeX Compiler Node] Pass 1 completed: {
+  success: true,
+  stdoutLength: 15637,
+  stderrLength: 0,
+  stdoutPreview: 'This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex)\n' +
+    ' restricted \\write18 enabled.\n' +
+    'entering extended mode\n' +
+    '\n' +
+    '(/var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job\n' +
+    '_1753304643503_4/document.tex\n' +
+    'LaTeX2e <2024-11-01> patch level 2\n' +
+    'L3 programming layer <2025-01-18>\n' +
+    '(/usr/local/texlive/2025/texmf-dist/tex/latex/beamer/beamer.cls\n' +
+    'Document Class: beamer 2025/02/04 v3.72 A class for typesetting presentations\n' +
+    '(/usr/local/texlive/2025/texmf-di',
+  stderrPreview: ''
+}
+[LaTeX Compiler Node] Another run needed for references/citations
+[LaTeX Compiler Node] Starting compilation pass 2/3
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+[LaTeX Compiler Node] Pass 2 completed: {
+  success: true,
+  stdoutLength: 15769,
+  stderrLength: 0,
+  stdoutPreview: 'This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex)\n' +
+    ' restricted \\write18 enabled.\n' +
+    'entering extended mode\n' +
+    '\n' +
+    '(/var/folders/8r/75n9fkp142nbckbfrzwlwd080000gn/T/latex-presentation-editor/job\n' +
+    '_1753304643503_4/document.tex\n' +
+    'LaTeX2e <2024-11-01> patch level 2\n' +
+    'L3 programming layer <2025-01-18>\n' +
+    '(/usr/local/texlive/2025/texmf-dist/tex/latex/beamer/beamer.cls\n' +
+    'Document Class: beamer 2025/02/04 v3.72 A class for typesetting presentations\n' +
+    '(/usr/local/texlive/2025/texmf-di',
+  stderrPreview: ''
+}
+[LaTeX Compiler Node] Compilation completed after 2 pass(es)
+[LaTeX Compiler Node] Compilation completed. Success: true
+[LaTeX Compiler Node] Stdout length: 15769, Stderr length: 0
+[LaTeX Compiler Node] Processing compilation results...
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+[LaTeX Compiler Node] Final result - Success: true, Errors: 0, Warnings: 0
+[LaTeX Compiler Node] Cleaning up job job_1753304643503_4
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] [Preview Service] Compilation completed for job: job_1753304643503_4 Success: true
+🖥️ [Renderer Console] [Preview Service] Caching successful compilation result
+🖥️ [Renderer Console] [Preview Service] Compilation successful, resolving promise
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] [Preview Service] Starting compilation for presentation: New Presentation
+🖥️ [Renderer Console] [Preview Service] Presentation has 1 slides
+🖥️ [Renderer Console] [Preview Service] Clearing existing compilation timeout
+🖥️ [Renderer Console] [Preview Service] Setting compilation timeout with debounce: 500 ms
+🖥️ [Renderer Console] [Preview Service] Starting actual compilation process
+🖥️ [Renderer Console] [Preview Service] Generating LaTeX source...
+🖥️ [Renderer Console] [Preview Service] Generated LaTeX source length: 1169
+🖥️ [Renderer Console] [Preview Service] LaTeX source preview: \documentclass[aspectratio=169,xcolor=dvipsnames,professionalfonts]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\definecolor{primary}{RGB}{59,130,246}
+\definecolor{secondary}{RGB}{107,114,128}
+\definecolor{accent}{RGB}{16,185,129}
+\definecolor{background}{RGB}{255,255,255}
+\definecolor{text}{RGB}{17,24,39}
+
+\setbea...
+🖥️ [Renderer Console] [Preview Service] Checking cache for single slide...
+🖥️ [Renderer Console] [Preview Service] Cache result: found
+🖥️ [Renderer Console] [Preview Service] Using cached compilation result
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] [Preview Service] Starting compilation for presentation: New Presentation
+🖥️ [Renderer Console] [Preview Service] Presentation has 1 slides
+🖥️ [Renderer Console] [Preview Service] Clearing existing compilation timeout
+🖥️ [Renderer Console] [Preview Service] Setting compilation timeout with debounce: 500 ms
+🖥️ [Renderer Console] [Preview Service] Starting actual compilation process
+🖥️ [Renderer Console] [Preview Service] Generating LaTeX source...
+🖥️ [Renderer Console] [Preview Service] Generated LaTeX source length: 1169
+🖥️ [Renderer Console] [Preview Service] LaTeX source preview: \documentclass[aspectratio=169,xcolor=dvipsnames,professionalfonts]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\definecolor{primary}{RGB}{59,130,246}
+\definecolor{secondary}{RGB}{107,114,128}
+\definecolor{accent}{RGB}{16,185,129}
+\definecolor{background}{RGB}{255,255,255}
+\definecolor{text}{RGB}{17,24,39}
+
+\setbea...
+🖥️ [Renderer Console] [Preview Service] Checking cache for single slide...
+🖥️ [Renderer Console] [Preview Service] Cache result: found
+🖥️ [Renderer Console] [Preview Service] Using cached compilation result
+🖥️ [Renderer Console] 🖼️ [PreviewPane] ===== PREVIEW PANE RENDERING =====
+🖥️ [Renderer Console] 🖼️ [PreviewPane] Component props: [object Object]
+🖥️ [Renderer Console] 📊 [PreviewPane] Redux state: [object Object]
+🖥️ [Renderer Console] 🔍 [PreviewPane] Preview hook state: [object Object]
+🖥️ [Renderer Console] Backup created: backup-1753304660624-qomz65amq (manual)

@@ -17,7 +17,6 @@ import { useUndoRedo, useActionRecorder } from './hooks/useUndoRedo';
 import { crashRecoveryService, RecoveryData } from './services/crashRecoveryService';
 import { accessibilityService } from './services/accessibilityService';
 import SlideNavigation from './components/SlideNavigation';
-import SlideCanvas from './components/SlideCanvas';
 import SimpleTextCanvas from './components/SimpleTextCanvas';
 import PreviewPane from './components/PreviewPane';
 import { PPTXImportDialog } from './components/PPTXImportDialog';

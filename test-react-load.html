@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test React Load</title>
+</head>
+<body>
+    <h1>Testing React App Load</h1>
+    <div id="root"></div>
+    
+    <script>
+        console.log('🔥 [TEST] HTML loaded, checking for React app...');
+        
+        // Check if the React app div exists
+        const rootDiv = document.getElementById('root');
+        console.log('🔥 [TEST] Root div found:', !!rootDiv);
+        
+        // Try to load the React bundle
+        const script = document.createElement('script');
+        script.src = './build/static/js/main.994a9c52.js';
+        script.onload = function() {
+            console.log('🔥 [TEST] React bundle loaded successfully');
+        };
+        script.onerror = function(error) {
+            console.error('🔥 [TEST] Error loading React bundle:', error);
+        };
+        document.head.appendChild(script);
+        
+        // Also load the CSS
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = './build/static/css/main.030958a2.css';
+        document.head.appendChild(link);
+        
+        setTimeout(() => {
+            console.log('🔥 [TEST] Checking root div content after 2 seconds...');
+            console.log('🔥 [TEST] Root div innerHTML:', rootDiv.innerHTML.substring(0, 200));
+        }, 2000);
+    </script>
+</body>
+</html>
