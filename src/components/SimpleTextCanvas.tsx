@@ -379,50 +379,6 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
     }
   };
 
-  // Test function to add textbox directly to canvas
-  const addTextDirectly = () => {
-    console.log('🧪 [SimpleTextCanvas] ===== ADDING TEXT DIRECTLY TO CANVAS =====');
-    
-    if (!fabricCanvasRef.current) {
-      console.error('❌ [SimpleTextCanvas] No fabric canvas available');
-      return;
-    }
-
-    try {
-      const textbox = new fabric.Textbox('Direct text test', {
-        left: 200,
-        top: 200,
-        width: 200,
-        height: 50,
-        fontSize: 18,
-        fontFamily: 'Arial',
-        fill: '#0000ff',
-        backgroundColor: 'rgba(0, 255, 0, 0.2)',
-        borderColor: '#00ff00',
-        cornerColor: '#00ff00',
-        cornerSize: 10,
-        editable: true,
-        selectable: true,
-        evented: true,
-      });
-
-      fabricCanvasRef.current.add(textbox);
-      fabricCanvasRef.current.renderAll();
-      
-      console.log('✅ [SimpleTextCanvas] Direct textbox added successfully');
-      
-      // Auto-select and enter edit mode
-      setTimeout(() => {
-        fabricCanvasRef.current?.setActiveObject(textbox);
-        textbox.enterEditing();
-        textbox.selectAll();
-        console.log('✅ [SimpleTextCanvas] Direct textbox entered edit mode');
-      }, 100);
-    } catch (error) {
-      console.error('❌ [SimpleTextCanvas] Error adding direct textbox:', error);
-    }
-  };
-
   if (!currentSlide) {
     console.log('❌ [SimpleTextCanvas] No current slide found');
     return <div className="slide-canvas-error">Slide not found</div>;
@@ -448,62 +404,13 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
             cursor: 'pointer'
           }}
         >
-          📝 Add Text (Redux)
+          📝
         </button>
-        
-        <button 
-          onClick={addTextDirectly} 
-          className="toolbar-button"
-          type="button"
-          title="Add text directly to canvas"
-          style={{ 
-            padding: '10px 20px', 
-            backgroundColor: '#28a745', 
-            color: 'white', 
-            border: 'none', 
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
-          🧪 Add Text (Direct)
-        </button>
-        
-        <button 
-          onClick={debugPreview} 
-          className="toolbar-button"
-          type="button"
-          title="Debug preview generation"
-          style={{ 
-            padding: '10px 20px', 
-            backgroundColor: '#dc3545', 
-            color: 'white', 
-            border: 'none', 
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
-          🔍 Debug Preview
-        </button>
-        
-        <div style={{ marginTop: '10px', fontSize: '12px' }}>
-          Canvas Ready: {isCanvasReady ? '✅' : '❌'} | 
-          Elements: {currentSlide?.elements?.length || 0} | 
-          Slide ID: {slideId}
-        </div>
       </div>
-      
       <canvas 
         ref={canvasRef} 
         style={{ border: '1px solid #ccc' }}
       />
-      
-      <div style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
-        Instructions: 
-        <br />• Click "Add Text (Redux)" to add text through Redux store
-        <br />• Click "Add Text (Direct)" to add text directly to canvas
-        <br />• Double-click any text to edit it
-        <br />• Check browser console for detailed logs
-      </div>
     </div>
   );
 };
