@@ -50,14 +50,14 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
   // Add logging for isTextEditing state changes and safety timeout
   useEffect(() => {
     console.log('🔄 isTextEditing state changed to:', isTextEditing);
-    
+
     // Safety mechanism: if isTextEditing is stuck as true for too long, reset it
     if (isTextEditing) {
       const timeoutId = setTimeout(() => {
         console.log('⚠️ [SlideCanvas] isTextEditing has been true for 10 seconds, resetting to false');
         setIsTextEditing(false);
       }, 10000); // 10 second timeout
-      
+
       return () => clearTimeout(timeoutId);
     }
   }, [isTextEditing]);
@@ -391,13 +391,13 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
 
   const handleObjectMoved = useCallback((e: fabric.IEvent) => {
     const obj = e.target;
-    
+
     console.log('✅ [SlideCanvas] Object moved (final position):', {
       elementId: obj?.data?.elementId,
       finalPosition: { x: obj?.left || 0, y: obj?.top || 0 },
       elementType: obj?.type
     });
-    
+
     // Hide snap guides after movement
     setTimeout(() => dragDropService.hideSnapGuides(), 500);
 
@@ -420,7 +420,7 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
       if (obj.type === 'textbox') {
         const textbox = obj as fabric.Textbox;
         console.log('📍 [SlideCanvas] Text element moved, scheduling LaTeX generation with debouncing');
-        
+
         latexGenerationService.scheduleGeneration(
           slideId,
           obj.data.elementId,
@@ -562,7 +562,7 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
         dispatch(updateElement({
           slideId,
           elementId: target.data.elementId,
-          updates: { 
+          updates: {
             content: textbox.text,
             position: { x: textbox.left || 0, y: textbox.top || 0 }
           }
@@ -892,14 +892,14 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
           // Ensure safe positioning (within canvas bounds)
           const safeLeft = Math.max(0, Math.min(element.position.x, width - 50));
           const safeTop = Math.max(0, Math.min(element.position.y, height - 30));
-          
+
           // Ensure safe sizing (minimum dimensions)
           const safeWidth = Math.max(50, element.size.width);
           const safeHeight = Math.max(20, element.size.height);
-          
+
           // Ensure safe font size
           const safeFontSize = Math.max(8, element.properties.fontSize || 16);
-          
+
           // Ensure visible text color (not white on white background)
           let textColor = '#000000'; // Default to black
           if (element.properties.textColor) {
@@ -1019,7 +1019,7 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
       });
 
       canvas.add(fabricObject);
-      
+
       console.log('✅ [SlideCanvas] Fabric object added successfully:', {
         elementId: element.id,
         canvasObjectCountAfter: canvas.getObjects().length,
@@ -1554,7 +1554,7 @@ const SlideCanvas: React.FC<SlideCanvasProps> = ({
     <div className="slide-canvas-container">
       {/* Main Toolbar */}
       <MainToolbar />
-      
+
       <div className="canvas-toolbar">
         <button
           onClick={addTextElement}

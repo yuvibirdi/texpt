@@ -353,6 +353,11 @@ export class LaTeXGenerator {
       // Handle newlines properly - use \\ for line breaks within textblock
       // Also handle automatic text wrapping by preserving spaces
       processedContent = this.processTextContent(content);
+      
+      // If content has line breaks, wrap it in a minipage for proper line break handling
+      if (processedContent.includes('\\\\')) {
+        processedContent = `\\begin{minipage}[t]{${dynamicWidth.toFixed(2)}cm}\n${processedContent}\n\\end{minipage}`;
+      }
     }
 
     latex += processedContent;
@@ -840,6 +845,16 @@ export class LaTeXGenerator {
    * Process text content for LaTeX output with proper newline handling
    */
   private processTextContent(content: string): string {
+    console.log('📝 [LaTeXGenerator] ===== PROCESSING TEXT CONTENT =====');
+    console.log('📝 [LaTeXGenerator] Original content:', {
+      content,
+      length: content.length,
+      hasNewlines: content.includes('\n'),
+      newlineCount: (content.match(/\n/g) || []).length,
+      contentAsArray: Array.from(content).map(char => char === '\n' ? '\\n' : char),
+      contentCharCodes: Array.from(content).map(char => char.charCodeAt(0))
+    });
+    
     // Escape LaTeX special characters first
     let processed = this.escapeLatex(content);
 
@@ -848,7 +863,7 @@ export class LaTeXGenerator {
     processed = processed.replace(/\\\\n/g, '\\\\'); // Convert \\n to \\
     processed = processed.replace(/\n/g, '\\\\');    // Convert \n to \\
 
-    // 2. Handle paragraph breaks (double newlines)
+    // 2. Handle paragraph breaks (double newlines) - add proper spacing
     processed = processed.replace(/\\\\\\\\/g, '\\\\[0.5em]'); // Add spacing between paragraphs
 
     // 3. Handle multiple consecutive spaces (preserve formatting)
@@ -863,6 +878,13 @@ export class LaTeXGenerator {
 
     // 5. Clean up any trailing line breaks
     processed = processed.replace(/\\\\+$/, ''); // Remove trailing \\
+
+    console.log('📝 [LaTeXGenerator] Processed content:', {
+      processed,
+      length: processed.length,
+      hasLatexBreaks: processed.includes('\\\\'),
+      latexBreakCount: (processed.match(/\\\\/g) || []).length
+    });
 
     return processed;
   }
