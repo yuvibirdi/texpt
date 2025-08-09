@@ -334,15 +334,6 @@ export class LaTeXGenerator {
       latex += `{${textFormatting}`;
     }
 
-    // Handle text alignment
-    if (properties.textAlign === 'center') {
-      latex += '\\centering ';
-    } else if (properties.textAlign === 'right') {
-      latex += '\\raggedleft ';
-    } else {
-      latex += '\\raggedright ';
-    }
-
     // Process content - handle line breaks and wrapping properly
     let processedContent = '';
     if (properties.listType && properties.listType !== 'none' && content) {
@@ -354,9 +345,28 @@ export class LaTeXGenerator {
       // Also handle automatic text wrapping by preserving spaces
       processedContent = this.processTextContent(content);
       
+      // Get text alignment command
+      let alignmentCommand = '';
+      if (properties.textAlign === 'center') {
+        alignmentCommand = '\\centering ';
+      } else if (properties.textAlign === 'right') {
+        alignmentCommand = '\\raggedleft ';
+      } else {
+        alignmentCommand = '\\raggedright ';
+      }
+      
+      console.log('📐 [LaTeXGenerator] Text alignment:', {
+        textAlign: properties.textAlign,
+        alignmentCommand: alignmentCommand.trim(),
+        hasLineBreaks: processedContent.includes('\\\\')
+      });
+      
       // If content has line breaks, wrap it in a minipage for proper line break handling
       if (processedContent.includes('\\\\')) {
-        processedContent = `\\begin{minipage}[t]{${dynamicWidth.toFixed(2)}cm}\n${processedContent}\n\\end{minipage}`;
+        processedContent = `\\begin{minipage}[t]{${dynamicWidth.toFixed(2)}cm}\n${alignmentCommand}${processedContent}\n\\end{minipage}`;
+      } else {
+        // For single-line text, apply alignment directly
+        processedContent = alignmentCommand + processedContent;
       }
     }
 
