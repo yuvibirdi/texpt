@@ -100,9 +100,13 @@ export class PreviewService extends EventEmitter {
           console.log('[Preview Service] Starting actual compilation process');
           this.emit('compilation-started');
 
+          // Process base64 images before LaTeX generation
+          console.log('[Preview Service] Processing base64 images...');
+          const processedPresentation = await this.processBase64Images(presentation);
+
           // Generate LaTeX source
           console.log('[Preview Service] Generating LaTeX source...');
-          const latexSource = latexGenerator.generateDocument(presentation, {
+          const latexSource = latexGenerator.generateDocument(processedPresentation, {
             includePackages: true,
             includeDocumentClass: true,
             optimizeCode: true,
@@ -449,6 +453,79 @@ export class PreviewService extends EventEmitter {
       totalCompilations: 0,
       averageDuration: 0,
       successRate: 0,
+    };
+  }
+
+  /**
+   * Process base64 images in presentation by saving them as temporary files
+   */
+  private async processBase64Images(presentation: Presentation): Promise<Presentation> {
+    const processedSlides = await Promise.all(
+      presentation.slides.map(async (slide) => {
+        const processedElements = await Promise.all(
+          slide.elements.map(async (element) => {
+            if (element.type === 'image' && element.content?.startsWith('data:image/')) {
+              try {
+                // Extract image format and data
+                const matches = element.content.match(/^data:image\/([a-zA-Z]+);base64,(.+)$/);
+                if (matches) {
+                  const [, format, base64Data] = matches;
+                  
+                  // Check size limit (20MB max to prevent crashes)
+                  const sizeInBytes = (base64Data.length * 3) / 4; // Approximate base64 decoded size
+                  const maxSizeInBytes = 20 * 1024 * 1024; // 20MB
+                  
+                  if (sizeInBytes > maxSizeInBytes) {
+                    console.warn(`Image too large: ${(sizeInBytes / 1024 / 1024).toFixed(1)}MB, max allowed: 20MB`);
+                    throw new Error(`Image too large: ${(sizeInBytes / 1024 / 1024).toFixed(1)}MB`);
+                  }
+                  
+                  // Create temporary file using Electron's file system
+                  if (window.electronAPI && (window.electronAPI as any).exportWriteFileBase64) {
+                    const tempFileName = `temp_image_${element.id}.${format}`;
+                    const tempPath = `/tmp/latex-images/${tempFileName}`;
+                    
+                    console.log(`[Preview Service] Saving image: ${tempFileName} (${(sizeInBytes / 1024).toFixed(1)}KB)`);
+                    
+                    // Save file using base64 data directly
+                    const result = await (window.electronAPI as any).exportWriteFileBase64(tempPath, base64Data);
+                    
+                    if (result.success) {
+                      console.log(`[Preview Service] Image saved successfully: ${result.filePath}`);
+                      // Return element with file path instead of base64
+                      return {
+                        ...element,
+                        content: result.filePath
+                      };
+                    } else {
+                      console.error('Failed to save image:', result.error);
+                      throw new Error(result.error);
+                    }
+                  }
+                }
+              } catch (error) {
+                console.error('Failed to process base64 image:', error);
+                // Return element with placeholder content for failed images
+                return {
+                  ...element,
+                  content: 'example-image' // LaTeX built-in placeholder
+                };
+              }
+            }
+            return element;
+          })
+        );
+
+        return {
+          ...slide,
+          elements: processedElements
+        };
+      })
+    );
+
+    return {
+      ...presentation,
+      slides: processedSlides
     };
   }
 }

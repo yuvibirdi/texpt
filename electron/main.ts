@@ -623,6 +623,10 @@ function setupIpcHandlers(): void {
 
   ipcMain.handle('export:writeFileBuffer', async (_event, filePath: string, buffer: Buffer) => {
     try {
+      // Ensure directory exists
+      const dir = path.dirname(filePath);
+      fs.mkdirSync(dir, { recursive: true });
+      
       fs.writeFileSync(filePath, buffer);
       const stats = fs.statSync(filePath);
       

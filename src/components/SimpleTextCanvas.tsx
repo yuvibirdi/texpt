@@ -27,7 +27,7 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   const [fontSizeInput, setFontSizeInput] = useState<string>('16');
   const [currentTextColor, setCurrentTextColor] = useState<string>('#000000');
-  const [showOutOfBoundsWarning, setShowOutOfBoundsWarning] = useState<boolean>(false);
+  const [showOutOfBoundsWarning] = useState<boolean>(false);
   const fontSizeDebounceRef = useRef<NodeJS.Timeout | null>(null);
 
   // Get current slide data from Redux store
@@ -63,54 +63,7 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
       fabricCanvasRef.current = canvas;
       setIsCanvasReady(true);
 
-      // Add boundary constraints to prevent objects from moving outside canvas
-      canvas.on('object:moving', (e) => {
-        const obj = e.target;
-        if (!obj) return;
-
-        const canvasWidth = canvas.getWidth();
-        const canvasHeight = canvas.getHeight();
-
-        // Get object bounds
-        const objWidth = obj.getScaledWidth();
-        const objHeight = obj.getScaledHeight();
-
-        // Check if object would be out of bounds
-        let isOutOfBounds = false;
-
-        // Constrain horizontal movement
-        if (obj.left! < 0) {
-          obj.set('left', 0);
-          isOutOfBounds = true;
-        }
-        if (obj.left! + objWidth > canvasWidth) {
-          obj.set('left', canvasWidth - objWidth);
-          isOutOfBounds = true;
-        }
-
-        // Constrain vertical movement
-        if (obj.top! < 0) {
-          obj.set('top', 0);
-          isOutOfBounds = true;
-        }
-        if (obj.top! + objHeight > canvasHeight) {
-          obj.set('top', canvasHeight - objHeight);
-          isOutOfBounds = true;
-        }
-
-        // Show/hide warning based on bounds
-        if (isOutOfBounds) {
-          setShowOutOfBoundsWarning(true);
-          console.log('⚠️ [SimpleTextCanvas] Object hit canvas boundary - showing warning');
-
-          // Auto-hide warning after 3 seconds
-          setTimeout(() => {
-            setShowOutOfBoundsWarning(false);
-          }, 3000);
-        }
-
-        console.log('🔒 [SimpleTextCanvas] Object constrained to canvas bounds');
-      });
+      // Canvas bounds constraint temporarily disabled to debug scaling issues
 
       // Selection event handlers for formatting
       canvas.on('selection:created', (e) => {
@@ -211,10 +164,13 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
         }
       });
 
-      // Add textbox resize handling for proper text reflow
+      // Combined scaling handler for both textboxes and images
       canvas.on('object:scaling', (e) => {
         const obj = e.target;
-        if (obj && obj.type === 'textbox') {
+        if (!obj) return;
+
+        // Handle textbox scaling with reflow
+        if (obj.type === 'textbox') {
           console.log('📏 [SimpleTextCanvas] ===== TEXTBOX SCALING =====');
           const textbox = obj as fabric.Textbox;
 
@@ -236,10 +192,44 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
             elementId: textbox.data?.elementId
           });
         }
+
+        // TEMPORARILY DISABLED: Handle canvas bounds constraint for all objects
+        // const canvasWidth = canvas.getWidth();
+        // const canvasHeight = canvas.getHeight();
+
+        // // Get object bounds with current scaling
+        // const objWidth = obj.getScaledWidth();
+        // const objHeight = obj.getScaledHeight();
+
+        // // Prevent scaling beyond canvas bounds
+        // let needsConstraint = false;
+
+        // if (obj.left! + objWidth > canvasWidth) {
+        //   const maxScaleX = (canvasWidth - obj.left!) / (obj.width || 1);
+        //   if (obj.scaleX! > maxScaleX) {
+        //     obj.set('scaleX', maxScaleX);
+        //     needsConstraint = true;
+        //   }
+        // }
+
+        // if (obj.top! + objHeight > canvasHeight) {
+        //   const maxScaleY = (canvasHeight - obj.top!) / (obj.height || 1);
+        //   if (obj.scaleY! > maxScaleY) {
+        //     obj.set('scaleY', maxScaleY);
+        //     needsConstraint = true;
+        //   }
+        // }
+
+        // if (needsConstraint) {
+        //   console.log('🔒 [SimpleTextCanvas] Object scaling constrained to canvas bounds');
+        // }
       });
 
       canvas.on('object:scaled', (e) => {
         const obj = e.target;
+        console.log('🎯 [SimpleTextCanvas] ===== OBJECT SCALED EVENT =====');
+        console.log('🎯 [SimpleTextCanvas] Object type:', obj?.type, 'Has elementId:', !!obj?.data?.elementId);
+
         if (obj && obj.type === 'textbox' && obj.data?.elementId) {
           console.log('📏 [SimpleTextCanvas] ===== TEXTBOX SCALED COMPLETE =====');
           const textbox = obj as fabric.Textbox;
@@ -258,6 +248,44 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
           }));
 
           console.log('✅ [SimpleTextCanvas] Textbox size updated in Redux');
+        } else if (obj && obj.type === 'image' && obj.data?.elementId) {
+          console.log('🖼️ [SimpleTextCanvas] ===== IMAGE SCALED COMPLETE =====');
+          const image = obj as fabric.Image;
+
+          // Calculate actual size from original dimensions and scale
+          const actualWidth = (image.width || 1) * (image.scaleX || 1);
+          const actualHeight = (image.height || 1) * (image.scaleY || 1);
+
+          console.log('🖼️ [SimpleTextCanvas] Image scaling details:', {
+            originalWidth: image.width,
+            originalHeight: image.height,
+            scaleX: image.scaleX,
+            scaleY: image.scaleY,
+            actualWidth,
+            actualHeight,
+            position: { x: image.left, y: image.top }
+          });
+
+          // Update Redux with new size
+          dispatch(updateElement({
+            slideId,
+            elementId: obj.data.elementId,
+            updates: {
+              size: {
+                width: actualWidth,
+                height: actualHeight
+              },
+              position: { x: image.left || 0, y: image.top || 0 }
+            }
+          }));
+
+          console.log('✅ [SimpleTextCanvas] Image size updated in Redux');
+        } else {
+          console.log('⚠️ [SimpleTextCanvas] Object scaled but no Redux update:', {
+            type: obj?.type,
+            hasElementId: !!obj?.data?.elementId,
+            elementId: obj?.data?.elementId
+          });
         }
       });
 
@@ -266,6 +294,7 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
         const obj = e.target;
         if (obj && obj.data?.elementId) {
           console.log('🔄 [SimpleTextCanvas] ===== OBJECT MOVED =====');
+          console.log('🔄 [SimpleTextCanvas] Object type:', obj.type, 'New position:', { x: obj.left, y: obj.top });
 
           dispatch(updateElement({
             slideId,
@@ -276,6 +305,12 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
           }));
 
           console.log('✅ [SimpleTextCanvas] Object position updated in Redux');
+        } else {
+          console.log('⚠️ [SimpleTextCanvas] Object moved but no Redux update:', {
+            type: obj?.type,
+            hasElementId: !!obj?.data?.elementId,
+            position: { x: obj?.left, y: obj?.top }
+          });
         }
       });
 
@@ -397,26 +432,55 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
 
         // Process each previously selected object
         previouslySelectedObjects.forEach((obj) => {
-          if (obj && obj.data?.elementId && obj.type === 'textbox') {
-            const textbox = obj as fabric.Textbox;
-            console.log('🔄 [SimpleTextCanvas] Updating deselected textbox (will trigger LaTeX after delay):', {
-              elementId: obj.data.elementId,
-              finalPosition: { x: textbox.left, y: textbox.top },
-              content: textbox.text,
-              textLength: textbox.text?.length || 0
-            });
-
-            // Update position and content in Redux - same as text:editing:exited
-            dispatch(updateElement({
-              slideId,
-              elementId: obj.data.elementId,
-              updates: {
+          if (obj && obj.data?.elementId) {
+            if (obj.type === 'textbox') {
+              const textbox = obj as fabric.Textbox;
+              console.log('🔄 [SimpleTextCanvas] Updating deselected textbox (will trigger LaTeX after delay):', {
+                elementId: obj.data.elementId,
+                finalPosition: { x: textbox.left, y: textbox.top },
                 content: textbox.text,
-                position: { x: textbox.left || 0, y: textbox.top || 0 }
-              }
-            }));
+                textLength: textbox.text?.length || 0
+              });
 
-            console.log('✅ [SimpleTextCanvas] Deselected object updated in Redux');
+              // Update position and content in Redux - same as text:editing:exited
+              dispatch(updateElement({
+                slideId,
+                elementId: obj.data.elementId,
+                updates: {
+                  content: textbox.text,
+                  position: { x: textbox.left || 0, y: textbox.top || 0 }
+                }
+              }));
+
+              console.log('✅ [SimpleTextCanvas] Deselected textbox updated in Redux');
+            } else if (obj.type === 'image') {
+              const image = obj as fabric.Image;
+              const calculatedWidth = (image.width || 0) * (image.scaleX || 1);
+              const calculatedHeight = (image.height || 0) * (image.scaleY || 1);
+
+              console.log('🔄 [SimpleTextCanvas] Updating deselected image (will trigger LaTeX after delay):', {
+                elementId: obj.data.elementId,
+                finalPosition: { x: image.left, y: image.top },
+                originalImageSize: { width: image.width, height: image.height },
+                scaleFactors: { scaleX: image.scaleX, scaleY: image.scaleY },
+                calculatedSize: { width: calculatedWidth, height: calculatedHeight }
+              });
+
+              // Update position and size in Redux
+              dispatch(updateElement({
+                slideId,
+                elementId: obj.data.elementId,
+                updates: {
+                  position: { x: image.left || 0, y: image.top || 0 },
+                  size: {
+                    width: calculatedWidth,
+                    height: calculatedHeight
+                  }
+                }
+              }));
+
+              console.log('✅ [SimpleTextCanvas] Deselected image updated in Redux');
+            }
           }
         });
 
@@ -475,12 +539,15 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
 
       if (element.type === 'text') {
         createTextElement(element, canvas);
+      } else if (element.type === 'image') {
+        createImageElement(element, canvas);
       }
     });
 
     canvas.renderAll();
     console.log('✅ [SimpleTextCanvas] All elements loaded');
-  }, [isCanvasReady, currentSlide]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCanvasReady, currentSlide, slideId, dispatch]);
 
   // Create a text element on the canvas
   const createTextElement = (element: SlideElement, canvas: fabric.Canvas) => {
@@ -550,6 +617,121 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
     }
   };
 
+  // Create an image element on the canvas
+  const createImageElement = (element: SlideElement, canvas: fabric.Canvas) => {
+    console.log('🖼️ [SimpleTextCanvas] ===== CREATING IMAGE ELEMENT =====');
+    console.log('🖼️ [SimpleTextCanvas] Element data:', {
+      id: element.id,
+      position: element.position,
+      size: element.size,
+      contentLength: element.content?.length || 0
+    });
+
+    if (!element.content) {
+      console.error('❌ [SimpleTextCanvas] No image content provided');
+      return;
+    }
+
+    try {
+      fabric.Image.fromURL(element.content, (img) => {
+        if (!img) {
+          console.error('❌ [SimpleTextCanvas] Failed to load image');
+          return;
+        }
+
+        // Calculate scale factors to match the stored size
+        const scaleX = element.size.width / (img.width || 1);
+        const scaleY = element.size.height / (img.height || 1);
+
+        console.log('🖼️ [SimpleTextCanvas] Image scaling calculation:', {
+          elementId: element.id,
+          originalImageSize: { width: img.width, height: img.height },
+          targetSize: element.size,
+          calculatedScale: { scaleX, scaleY }
+        });
+
+        img.set({
+          left: element.position.x,
+          top: element.position.y,
+          scaleX: scaleX,
+          scaleY: scaleY,
+          selectable: true,
+          evented: true,
+          // Enable all transformations
+          lockMovementX: false,
+          lockMovementY: false,
+          lockScalingX: false,
+          lockScalingY: false,
+          lockRotation: false,
+          // Scaling behavior
+          lockScalingFlip: true, // Prevent flipping
+          lockUniScaling: true, // Force uniform scaling to maintain aspect ratio
+          // Visual styling
+          borderColor: '#007bff',
+          cornerColor: '#007bff',
+          cornerSize: 8, // Larger corners for easier grabbing
+          transparentCorners: false,
+          // Resize constraints
+          minScaleLimit: 0.1,
+          // Enable controls
+          hasControls: true,
+          hasBorders: true,
+        });
+
+        // Store element ID for reference
+        img.data = { elementId: element.id };
+
+        // Add event listeners for image transformations
+        img.on('scaling', () => {
+          console.log('🔥 [SimpleTextCanvas] IMAGE OBJECT SCALING EVENT FIRED!');
+        });
+
+        img.on('scaled', () => {
+          console.log('🔥 [SimpleTextCanvas] IMAGE OBJECT SCALED EVENT FIRED!');
+          // Update Redux with new scale values
+          if (img.data?.elementId) {
+            dispatch(updateElement({
+              slideId,
+              elementId: img.data.elementId,
+              updates: {
+                position: { x: img.left || 0, y: img.top || 0 },
+                size: {
+                  width: (img.width || 0) * (img.scaleX || 1),
+                  height: (img.height || 0) * (img.scaleY || 1)
+                }
+              }
+            }));
+            console.log('✅ [SimpleTextCanvas] Image scale updated in Redux');
+          }
+        });
+
+        img.on('moving', () => {
+          console.log('🔥 [SimpleTextCanvas] IMAGE OBJECT MOVING EVENT FIRED!');
+        });
+
+        img.on('moved', () => {
+          console.log('🔥 [SimpleTextCanvas] IMAGE OBJECT MOVED EVENT FIRED!');
+          // Update Redux with new position
+          if (img.data?.elementId) {
+            dispatch(updateElement({
+              slideId,
+              elementId: img.data.elementId,
+              updates: {
+                position: { x: img.left || 0, y: img.top || 0 }
+              }
+            }));
+            console.log('✅ [SimpleTextCanvas] Image position updated in Redux');
+          }
+        });
+
+        canvas.add(img);
+        console.log('✅ [SimpleTextCanvas] Image added to canvas with event listeners');
+      });
+    } catch (error) {
+      console.error('❌ [SimpleTextCanvas] Error creating image:', error);
+    }
+  };
+
   // Add text element function
   const addTextElement = () => {
     console.log('🔘 [SimpleTextCanvas] ===== TEXT BUTTON CLICKED =====');
@@ -592,6 +774,80 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
     } catch (error) {
       console.error('❌ [SimpleTextCanvas] Error dispatching element:', error);
     }
+  };
+
+  // Add image element function
+  const addImageElement = () => {
+    console.log('🖼️ [SimpleTextCanvas] ===== IMAGE BUTTON CLICKED =====');
+
+    // Create file input element
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        handleImageFile(file);
+      }
+    };
+    input.click();
+  };
+
+  const handleImageFile = (file: File) => {
+    console.log('🖼️ [SimpleTextCanvas] Processing image file:', file.name);
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const imageUrl = e.target?.result as string;
+
+      // Create new image element data
+      const newElement: Omit<SlideElement, 'id' | 'createdAt' | 'updatedAt'> = {
+        type: 'image',
+        position: { x: 100, y: 100 },
+        size: { width: 200, height: 150 },
+        properties: {
+          opacity: 1,
+        },
+        content: imageUrl, // Store the base64 image data
+      };
+
+      console.log('🖼️ [SimpleTextCanvas] Creating new image element');
+
+      try {
+        dispatch(addElement({ slideId, element: newElement }));
+        console.log('✅ [SimpleTextCanvas] Image element dispatched to Redux');
+      } catch (error) {
+        console.error('❌ [SimpleTextCanvas] Error dispatching image element:', error);
+      }
+    };
+
+    reader.readAsDataURL(file);
+  };
+
+  // Handle drag and drop for images
+  const handleCanvasDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleCanvasDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    console.log('🖼️ [SimpleTextCanvas] ===== FILE DROPPED =====');
+
+    const files = Array.from(e.dataTransfer.files);
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+
+    if (imageFiles.length === 0) {
+      console.log('⚠️ [SimpleTextCanvas] No image files dropped');
+      return;
+    }
+
+    // Handle the first image file
+    const file = imageFiles[0];
+    console.log('🖼️ [SimpleTextCanvas] Processing dropped image:', file.name);
+    handleImageFile(file);
   };
 
   // Text formatting functions
@@ -812,7 +1068,7 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
       )}
 
       {/* Main toolbar */}
-      <div style={{ marginBottom: '10px' }}>
+      <div style={{ marginBottom: '10px', display: 'flex', gap: '10px' }}>
         <button
           onClick={addTextElement}
           style={{
@@ -826,6 +1082,21 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
           }}
         >
           ➕ Add Text Element
+        </button>
+
+        <button
+          onClick={addImageElement}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#28a745',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '16px'
+          }}
+        >
+          🖼️ Add Image
         </button>
       </div>
 
@@ -975,6 +1246,151 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
         </div>
       )}
 
+      {/* Image editing toolbar - only show when image is selected */}
+      {selectedObject && selectedObject.type === 'image' && (
+        <div style={{
+          marginBottom: '10px',
+          padding: '10px',
+          backgroundColor: '#e9ecef',
+          borderRadius: '4px',
+          display: 'flex',
+          gap: '10px',
+          alignItems: 'center',
+          flexWrap: 'wrap'
+        }}>
+          <span style={{ fontWeight: 'bold', marginRight: '10px' }}>Edit Image:</span>
+
+          {/* Opacity Control */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <label style={{ fontSize: '12px', fontWeight: 'bold' }}>Opacity:</label>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={(selectedObject.opacity || 1) * 100}
+              onChange={(e) => {
+                const opacity = parseInt(e.target.value) / 100;
+                if (fabricCanvasRef.current && selectedObject) {
+                  selectedObject.set('opacity', opacity);
+                  fabricCanvasRef.current.renderAll();
+
+                  // Update Redux store
+                  const elementId = selectedObject.data?.elementId;
+                  if (elementId) {
+                    dispatch(updateElement({
+                      slideId,
+                      elementId,
+                      updates: { properties: { opacity } }
+                    }));
+                  }
+                }
+              }}
+              style={{
+                width: '80px',
+                cursor: 'pointer'
+              }}
+              title="Image opacity"
+            />
+            <span style={{ fontSize: '11px', color: '#666' }}>
+              {Math.round((selectedObject.opacity || 1) * 100)}%
+            </span>
+          </div>
+
+          {/* Flip Controls */}
+          <button
+            onClick={() => {
+              if (fabricCanvasRef.current && selectedObject) {
+                const currentFlipX = selectedObject.flipX || false;
+                selectedObject.set('flipX', !currentFlipX);
+                fabricCanvasRef.current.renderAll();
+
+                // Update Redux store
+                const elementId = selectedObject.data?.elementId;
+                if (elementId) {
+                  dispatch(updateElement({
+                    slideId,
+                    elementId,
+                    updates: { properties: { flipX: !currentFlipX } }
+                  }));
+                }
+              }
+            }}
+            style={{
+              padding: '5px 10px',
+              backgroundColor: selectedObject.flipX ? '#007bff' : '#f8f9fa',
+              color: selectedObject.flipX ? 'white' : '#333',
+              border: '1px solid #ccc',
+              borderRadius: '3px',
+              cursor: 'pointer',
+              fontSize: '12px'
+            }}
+            title="Flip horizontally"
+          >
+            ↔️ Flip H
+          </button>
+
+          <button
+            onClick={() => {
+              if (fabricCanvasRef.current && selectedObject) {
+                const currentFlipY = selectedObject.flipY || false;
+                selectedObject.set('flipY', !currentFlipY);
+                fabricCanvasRef.current.renderAll();
+
+                // Update Redux store
+                const elementId = selectedObject.data?.elementId;
+                if (elementId) {
+                  dispatch(updateElement({
+                    slideId,
+                    elementId,
+                    updates: { properties: { flipY: !currentFlipY } }
+                  }));
+                }
+              }
+            }}
+            style={{
+              padding: '5px 10px',
+              backgroundColor: selectedObject.flipY ? '#007bff' : '#f8f9fa',
+              color: selectedObject.flipY ? 'white' : '#333',
+              border: '1px solid #ccc',
+              borderRadius: '3px',
+              cursor: 'pointer',
+              fontSize: '12px'
+            }}
+            title="Flip vertically"
+          >
+            ↕️ Flip V
+          </button>
+
+          {/* Delete Button */}
+          <button
+            onClick={() => {
+              if (fabricCanvasRef.current && selectedObject) {
+                const elementId = selectedObject.data?.elementId;
+                fabricCanvasRef.current.remove(selectedObject);
+                setSelectedObject(null);
+
+                // Update Redux store
+                if (elementId) {
+                  dispatch(deleteElement({ slideId, elementId }));
+                }
+              }
+            }}
+            style={{
+              padding: '5px 10px',
+              backgroundColor: '#dc3545',
+              color: 'white',
+              border: 'none',
+              borderRadius: '3px',
+              cursor: 'pointer',
+              fontSize: '12px'
+            }}
+            title="Delete image"
+          >
+            🗑️ Delete
+          </button>
+        </div>
+      )}
+
       <div style={{
         border: '2px solid #007bff',
         borderRadius: '4px',
@@ -990,7 +1406,9 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
             outline: 'none' // Remove focus outline for cleaner look
           }}
           tabIndex={0}
-          title="Click to focus, then use Delete or Backspace to delete selected elements"
+          title="Click to focus, drag images here, or use Delete/Backspace to delete selected elements"
+          onDrop={handleCanvasDrop}
+          onDragOver={handleCanvasDragOver}
         />
       </div>
 
@@ -1004,9 +1422,10 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
       }}>
         <strong>Instructions:</strong>
         <br />• Click "Add Text Element" to add new text
-        <br />• Click on text to select it and see formatting options
-        <br />• Double-click any text to edit it
-        <br />• Drag text elements to move them
+        <br />• Click "Add Image" or drag image files onto the canvas
+        <br />• Click on elements to select them and see formatting options
+        <br />• Double-click text to edit it
+        <br />• Drag elements to move them, resize using corner handles
         <br />• <strong>Press Delete or Backspace to delete selected elements</strong>
         <br />• Check browser console for detailed logs
       </div>

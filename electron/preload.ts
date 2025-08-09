@@ -29,6 +29,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   exportSaveFile: (data: string, options?: any) => ipcRenderer.invoke('export:saveFile', data, options),
   exportWriteFile: (filePath: string, content: string) => ipcRenderer.invoke('export:writeFile', filePath, content),
   exportWriteFileBuffer: (filePath: string, buffer: Buffer) => ipcRenderer.invoke('export:writeFileBuffer', filePath, buffer),
+  exportWriteFileBase64: (filePath: string, base64Data: string) => {
+    const buffer = Buffer.from(base64Data, 'base64');
+    return ipcRenderer.invoke('export:writeFileBuffer', filePath, buffer);
+  },
   exportGetFileStats: (filePath: string) => ipcRenderer.invoke('export:getFileStats', filePath),
   
   // Error reporting

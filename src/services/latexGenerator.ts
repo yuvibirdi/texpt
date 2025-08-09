@@ -291,16 +291,23 @@ export class LaTeXGenerator {
     // Convert coordinates directly from canvas to LaTeX
     const coords = this.convertCanvasToLatexCoordinates(position, size);
 
+    // Apply text margins to coordinates (0.3cm from each edge)
+    const TEXT_MARGIN = 0.3;
+    const TEXT_LEFT_BOUNDARY = 0.2 + TEXT_MARGIN;   // 0.5cm
+    const TEXT_RIGHT_BOUNDARY = 15.5 - TEXT_MARGIN; // 15.2cm
+    
+    // Adjust text position to respect margins
+    const textX = Math.max(TEXT_LEFT_BOUNDARY, coords.x);
+
     // Calculate dynamic text block width based on font size and content
     let dynamicWidth = this.calculateTextBlockWidth(content, properties, coords.width);
 
     // Ensure the text block doesn't extend beyond the right boundary
-    const TEXT_RIGHT_BOUNDARY = 15.2; // 15.5 - 0.3 margin
-    const maxX = coords.x + dynamicWidth;
+    const maxX = textX + dynamicWidth;
 
     if (maxX > TEXT_RIGHT_BOUNDARY) {
       // Adjust width to fit within boundaries
-      const adjustedWidth = TEXT_RIGHT_BOUNDARY - coords.x;
+      const adjustedWidth = TEXT_RIGHT_BOUNDARY - textX;
       console.log(`⚠️ [Width Adjustment] Text would exceed boundary. Original: ${dynamicWidth.toFixed(2)}cm, Adjusted: ${adjustedWidth.toFixed(2)}cm`);
       dynamicWidth = Math.max(0.8, adjustedWidth); // Ensure minimum width
     }
@@ -327,8 +334,8 @@ export class LaTeXGenerator {
       textFormatting += `\\color{${colorName}} `;
     }
 
-    // Use textblock with dynamic width
-    latex += `\\begin{textblock*}{${dynamicWidth.toFixed(2)}cm}(${coords.x.toFixed(2)}cm,${coords.y.toFixed(2)}cm)\n`;
+    // Use textblock with dynamic width and margin-adjusted position
+    latex += `\\begin{textblock*}{${dynamicWidth.toFixed(2)}cm}(${textX.toFixed(2)}cm,${coords.y.toFixed(2)}cm)\n`;
 
     if (textFormatting) {
       latex += `{${textFormatting}`;
@@ -382,7 +389,7 @@ export class LaTeXGenerator {
   }
 
   /**
-   * Generate image element LaTeX code
+   * Generate image element LaTeX code with preserved aspect ratio
    */
   private generateImageElement(element: SlideElement): string {
     const { position, size, properties, content } = element;
@@ -394,7 +401,24 @@ export class LaTeXGenerator {
     // Use textpos for consistent positioning with text elements
     const coords = this.convertCanvasToLatexCoordinates(position, size);
 
-    const imageOptions = [`width=${coords.width}cm`, `height=${coords.height}cm`];
+    // Calculate aspect ratio from canvas size to maintain proper scaling
+    const canvasAspectRatio = size.width / size.height;
+    const latexAspectRatio = coords.width / coords.height;
+    
+    let imageOptions: string[] = [];
+    
+    // FIXED: Use only width OR height to maintain aspect ratio, not both
+    // This prevents distortion between canvas and PDF output
+    if (canvasAspectRatio > latexAspectRatio) {
+      // Image is wider relative to the target area - constrain by width
+      imageOptions.push(`width=${coords.width.toFixed(3)}cm`);
+    } else {
+      // Image is taller relative to the target area - constrain by height  
+      imageOptions.push(`height=${coords.height.toFixed(3)}cm`);
+    }
+    
+    // Always preserve aspect ratio
+    imageOptions.push('keepaspectratio');
 
     if (properties.crop) {
       const { crop } = properties;
@@ -402,12 +426,27 @@ export class LaTeXGenerator {
       imageOptions.push('clip');
     }
 
-    latex += `\\begin{textblock*}{${coords.width}cm}(${coords.x}cm,${coords.y}cm)\n`;
-    latex += `\\includegraphics[${imageOptions.join(',')}]{${content}}\n`;
+    // Images should be processed by preview service before reaching here
+    let imagePath = content;
+
+    console.log('🖼️ [LaTeX Generator] Image generation:', {
+      elementId: element.id,
+      canvasSize: { width: size.width, height: size.height },
+      latexCoords: coords,
+      canvasAspectRatio: canvasAspectRatio.toFixed(3),
+      latexAspectRatio: latexAspectRatio.toFixed(3),
+      constrainBy: canvasAspectRatio > latexAspectRatio ? 'width' : 'height',
+      imageOptions
+    });
+
+    latex += `\\begin{textblock*}{${coords.width.toFixed(3)}cm}(${coords.x.toFixed(3)}cm,${coords.y.toFixed(3)}cm)\n`;
+    latex += `\\includegraphics[${imageOptions.join(',')}]{${imagePath}}\n`;
     latex += '\\end{textblock*}\n';
 
     return latex;
   }
+
+
 
   /**
    * Generate shape element LaTeX code using TikZ
@@ -551,41 +590,38 @@ export class LaTeXGenerator {
     const Y_OFFSET = 1.0;          // Top edge offset
     const USABLE_HEIGHT_CM = 7.3;  // 8.3 - 1.0 = 7.3cm usable height
 
-    // Add 0.3cm margins from left and right edges for text
-    const TEXT_MARGIN = 0.3;
-    const TEXT_LEFT_BOUNDARY = SLIDE_LEFT_EDGE + TEXT_MARGIN;   // 0.2 + 0.3 = 0.5cm
-    const TEXT_RIGHT_BOUNDARY = SLIDE_RIGHT_EDGE - TEXT_MARGIN; // 15.5 - 0.3 = 15.2cm
-    const TEXT_USABLE_WIDTH = TEXT_RIGHT_BOUNDARY - TEXT_LEFT_BOUNDARY; // 14.7cm
+    // For images, use the full slide area (no text margins)
+    // For text, we'll add margins in the text generation function
+    const USABLE_WIDTH_CM = SLIDE_RIGHT_EDGE - SLIDE_LEFT_EDGE; // 15.3cm
 
-    // Scale factors based on text usable area (with margins)
-    const X_SCALE = TEXT_USABLE_WIDTH / CANVAS_WIDTH;   // 14.7 / 800 = 0.018375
-    const Y_SCALE = USABLE_HEIGHT_CM / CANVAS_HEIGHT;   // 7.3 / 600 = 0.012167
+    // Scale factors based on full usable area
+    const X_SCALE = USABLE_WIDTH_CM / CANVAS_WIDTH;   // 15.3 / 800 = 0.019125
+    const Y_SCALE = USABLE_HEIGHT_CM / CANVAS_HEIGHT; // 7.3 / 600 = 0.012167
 
-    // Convert coordinates using the text-safe area
-    const x = TEXT_LEFT_BOUNDARY + (position.x * X_SCALE);
+    // Convert coordinates using the full usable area
+    const x = SLIDE_LEFT_EDGE + (position.x * X_SCALE);
     const y = Y_OFFSET + (position.y * Y_SCALE);
     const width = size.width * X_SCALE;
     const height = size.height * Y_SCALE;
 
-    // Calculate dynamic center within text-safe area
-    const centerX = TEXT_LEFT_BOUNDARY + (TEXT_USABLE_WIDTH / 2); // 0.5 + 14.7/2 = 7.85cm
-    const centerY = Y_OFFSET + (USABLE_HEIGHT_CM / 2);            // 1.0 + 7.3/2 = 4.65cm
+    // Calculate dynamic center within usable area
+    const centerX = SLIDE_LEFT_EDGE + (USABLE_WIDTH_CM / 2); // 0.2 + 15.3/2 = 7.85cm
+    const centerY = Y_OFFSET + (USABLE_HEIGHT_CM / 2);       // 1.0 + 7.3/2 = 4.65cm
 
     console.log(`🔧 [LaTeX Generator] Coordinate conversion with margins:`, {
       input: { x: position.x, y: position.y, width: size.width, height: size.height },
       output: { x: x.toFixed(3), y: y.toFixed(3), width: width.toFixed(3), height: height.toFixed(3) },
       scales: { X_SCALE: X_SCALE.toFixed(6), Y_SCALE: Y_SCALE.toFixed(6) },
-      boundaries: { TEXT_LEFT_BOUNDARY, TEXT_RIGHT_BOUNDARY, TEXT_USABLE_WIDTH },
-      margins: { TEXT_MARGIN },
+      boundaries: { SLIDE_LEFT_EDGE, SLIDE_RIGHT_EDGE, USABLE_WIDTH_CM },
       dynamicCenter: { centerX: centerX.toFixed(2), centerY: centerY.toFixed(2) }
     });
 
     return {
-      x: Math.max(TEXT_LEFT_BOUNDARY, Math.min(x, TEXT_RIGHT_BOUNDARY)), // Clamp to text-safe area
-      y: Math.max(Y_OFFSET, Math.min(y, Y_OFFSET + USABLE_HEIGHT_CM)),   // Clamp to usable area
+      x: Math.max(SLIDE_LEFT_EDGE, Math.min(x, SLIDE_RIGHT_EDGE)), // Clamp to slide area
+      y: Math.max(Y_OFFSET, Math.min(y, Y_OFFSET + USABLE_HEIGHT_CM)), // Clamp to usable area
       width: Math.max(0.1, width), // Very small minimum width
       height: Math.max(0.1, height), // Very small minimum height
-      maxAllowedWidth: TEXT_USABLE_WIDTH // Pass this for width calculations
+      maxAllowedWidth: USABLE_WIDTH_CM // Pass this for width calculations
     };
   }
 
@@ -798,7 +834,7 @@ export class LaTeXGenerator {
     const lines = content.split('\n');
     const maxLineLength = Math.max(...lines.map(line => line.length));
 
-    // Text-safe area width (14.7cm with 0.3cm margins on each side)
+    // Text-safe area width (14.6cm with 0.3cm margins on each side: 15.2 - 0.5 = 14.7cm)
     const TEXT_USABLE_WIDTH = 14.7;
 
     // Base width calculation considering font size
