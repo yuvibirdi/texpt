@@ -51,7 +51,7 @@ const AccessibilitySettings: React.FC<AccessibilitySettingsProps> = ({ isOpen, o
   };
 
   return (
-    <div 
+    <div
       className="accessibility-settings-overlay"
       role="dialog"
       aria-labelledby="accessibility-settings-title"
@@ -80,7 +80,7 @@ const AccessibilitySettings: React.FC<AccessibilitySettingsProps> = ({ isOpen, o
             </p>
             <div className="radio-group" role="radiogroup" aria-labelledby="keyboard-mode-label">
               <span id="keyboard-mode-label" className="sr-only">Keyboard navigation mode</span>
-              
+
               <label className="radio-option">
                 <input
                   type="radio"
@@ -131,7 +131,7 @@ const AccessibilitySettings: React.FC<AccessibilitySettingsProps> = ({ isOpen, o
           {/* Visual Settings */}
           <section className="settings-section">
             <h3>Visual Settings</h3>
-            
+
             <label className="checkbox-option">
               <input
                 type="checkbox"
@@ -193,7 +193,7 @@ const AccessibilitySettings: React.FC<AccessibilitySettingsProps> = ({ isOpen, o
           {/* Screen Reader Settings */}
           <section className="settings-section">
             <h3>Screen Reader Support</h3>
-            
+
             <label className="checkbox-option">
               <input
                 type="checkbox"
@@ -224,7 +224,7 @@ const AccessibilitySettings: React.FC<AccessibilitySettingsProps> = ({ isOpen, o
           {/* Navigation Settings */}
           <section className="settings-section">
             <h3>Navigation Settings</h3>
-            
+
             <label className="checkbox-option">
               <input
                 type="checkbox"
@@ -254,7 +254,7 @@ const AccessibilitySettings: React.FC<AccessibilitySettingsProps> = ({ isOpen, o
                   <li><kbd>Ctrl+T</kbd> - Add text element</li>
                 </ul>
               </div>
-              
+
               <div className="shortcuts-column">
                 <h4>Canvas Shortcuts</h4>
                 <ul>

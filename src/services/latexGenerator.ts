@@ -295,7 +295,7 @@ export class LaTeXGenerator {
     const TEXT_MARGIN = 0.3;
     const TEXT_LEFT_BOUNDARY = 0.2 + TEXT_MARGIN;   // 0.5cm
     const TEXT_RIGHT_BOUNDARY = 15.5 - TEXT_MARGIN; // 15.2cm
-    
+
     // Adjust text position to respect margins
     const textX = Math.max(TEXT_LEFT_BOUNDARY, coords.x);
 
@@ -316,9 +316,24 @@ export class LaTeXGenerator {
     let textFormatting = '';
 
     if (properties.fontSize) {
-      // Use proper font size with appropriate line spacing
-      const lineSpacing = properties.fontSize * 1.2;
-      textFormatting += `\\fontsize{${properties.fontSize}}{${lineSpacing}}\\selectfont`;
+      // Scale font size based on coordinate conversion ratio
+      // Canvas reference: 800x600, LaTeX usable: 15.3cm x 7.3cm
+      const CANVAS_WIDTH = 800;
+      const USABLE_WIDTH_CM = 15.3;
+      const SCALE_FACTOR = USABLE_WIDTH_CM / CANVAS_WIDTH; // ~0.019125
+
+      // Scale the font size to match the coordinate system
+      const scaledFontSize = properties.fontSize * SCALE_FACTOR * 28.35; // Convert to points (1cm = 28.35pt)
+      const lineSpacing = scaledFontSize * 1.2;
+
+      console.log('📝 [Font Scaling]', {
+        originalFontSize: properties.fontSize,
+        scaleFactor: SCALE_FACTOR,
+        scaledFontSize: scaledFontSize.toFixed(1),
+        lineSpacing: lineSpacing.toFixed(1)
+      });
+
+      textFormatting += `\\fontsize{${scaledFontSize.toFixed(1)}}{${lineSpacing.toFixed(1)}}\\selectfont`;
     }
 
     if (properties.fontWeight === 'bold') {
@@ -351,7 +366,7 @@ export class LaTeXGenerator {
       // Handle newlines properly - use \\ for line breaks within textblock
       // Also handle automatic text wrapping by preserving spaces
       processedContent = this.processTextContent(content);
-      
+
       // Get text alignment command
       let alignmentCommand = '';
       if (properties.textAlign === 'center') {
@@ -361,13 +376,13 @@ export class LaTeXGenerator {
       } else {
         alignmentCommand = '\\raggedright ';
       }
-      
+
       console.log('📐 [LaTeXGenerator] Text alignment:', {
         textAlign: properties.textAlign,
         alignmentCommand: alignmentCommand.trim(),
         hasLineBreaks: processedContent.includes('\\\\')
       });
-      
+
       // If content has line breaks, wrap it in a minipage for proper line break handling
       if (processedContent.includes('\\\\')) {
         processedContent = `\\begin{minipage}[t]{${dynamicWidth.toFixed(2)}cm}\n${alignmentCommand}${processedContent}\n\\end{minipage}`;
@@ -404,9 +419,9 @@ export class LaTeXGenerator {
     // Calculate aspect ratio from canvas size to maintain proper scaling
     const canvasAspectRatio = size.width / size.height;
     const latexAspectRatio = coords.width / coords.height;
-    
+
     let imageOptions: string[] = [];
-    
+
     // FIXED: Use only width OR height to maintain aspect ratio, not both
     // This prevents distortion between canvas and PDF output
     if (canvasAspectRatio > latexAspectRatio) {
@@ -416,7 +431,7 @@ export class LaTeXGenerator {
       // Image is taller relative to the target area - constrain by height  
       imageOptions.push(`height=${coords.height.toFixed(3)}cm`);
     }
-    
+
     // Always preserve aspect ratio
     imageOptions.push('keepaspectratio');
 
@@ -900,7 +915,7 @@ export class LaTeXGenerator {
       contentAsArray: Array.from(content).map(char => char === '\n' ? '\\n' : char),
       contentCharCodes: Array.from(content).map(char => char.charCodeAt(0))
     });
-    
+
     // Escape LaTeX special characters first
     let processed = this.escapeLatex(content);
 

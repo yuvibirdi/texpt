@@ -462,8 +462,6 @@ function App() {
               <div className="slide-editor">
                 <SimpleTextCanvas 
                   slideId={currentSlide.id}
-                  width={presentation?.settings.slideSize.width || 800}
-                  height={presentation?.settings.slideSize.height || 600}
                 />
               </div>
             ) : (

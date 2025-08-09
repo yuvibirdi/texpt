@@ -7,17 +7,17 @@ import { SlideElement } from '../types/presentation';
 
 interface SimpleTextCanvasProps {
   slideId: string;
-  width?: number;
-  height?: number;
 }
 
 const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
-  slideId,
-  width = 800,
-  height = 600
+  slideId
 }) => {
   console.log('🔥 [SimpleTextCanvas] ===== COMPONENT MOUNTING =====');
-  console.log('🔥 [SimpleTextCanvas] Props:', { slideId, width, height });
+  console.log('🔥 [SimpleTextCanvas] Props:', { slideId });
+
+  // State for responsive canvas dimensions
+  const [canvasDimensions, setCanvasDimensions] = useState({ width: 800, height: 600 });
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const dispatch = useDispatch();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -40,6 +40,67 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
     slideElementsCount: currentSlide?.elements?.length || 0
   });
 
+  // Calculate responsive canvas dimensions
+  useEffect(() => {
+    const calculateCanvasSize = () => {
+      if (!containerRef.current) return;
+      
+      const container = containerRef.current;
+      const containerRect = container.getBoundingClientRect();
+      
+      // Get available space (subtract padding and toolbar space)
+      const availableWidth = containerRect.width - 40; // 20px padding on each side
+      const availableHeight = containerRect.height - 200; // Space for toolbars and padding
+      
+      // Canvas dimensions that exactly match PDF page (1:1)
+      // PDF usable area: 15.3cm x 7.3cm
+      // Use a base size that matches this ratio exactly
+      const BASE_WIDTH = 800;  // Base canvas width
+      const BASE_HEIGHT = Math.round(BASE_WIDTH * (7.3 / 15.3)); // ~382px to match PDF ratio
+      
+      // Calculate scale factor to fit available space
+      const scaleX = availableWidth / BASE_WIDTH;
+      const scaleY = availableHeight / BASE_HEIGHT;
+      const scale = Math.min(scaleX, scaleY, 2.5); // Max 2.5x zoom
+      
+      // Apply scale but keep exact PDF proportions
+      const canvasWidth = BASE_WIDTH * Math.max(scale, 0.5); // Min 0.5x scale
+      const canvasHeight = BASE_HEIGHT * Math.max(scale, 0.5);
+      
+      console.log('📐 [SimpleTextCanvas] Canvas size calculation:', {
+        containerSize: { width: containerRect.width, height: containerRect.height },
+        availableSpace: { width: availableWidth, height: availableHeight },
+        baseSize: { width: BASE_WIDTH, height: BASE_HEIGHT },
+        scale: scale.toFixed(2),
+        finalSize: { width: canvasWidth, height: canvasHeight },
+        aspectRatio: (canvasWidth / canvasHeight).toFixed(3)
+      });
+      
+      setCanvasDimensions({ width: Math.round(canvasWidth), height: Math.round(canvasHeight) });
+    };
+
+    // Initial calculation
+    const timer = setTimeout(calculateCanvasSize, 100); // Small delay to ensure container is rendered
+
+    // Set up resize observer for responsive behavior
+    const resizeObserver = new ResizeObserver(() => {
+      calculateCanvasSize();
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    // Also listen to window resize as fallback
+    window.addEventListener('resize', calculateCanvasSize);
+
+    return () => {
+      clearTimeout(timer);
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', calculateCanvasSize);
+    };
+  }, []);
+
   // Initialize Fabric.js canvas
   useEffect(() => {
     console.log('🔥 [SimpleTextCanvas] ===== INITIALIZING CANVAS =====');
@@ -52,8 +113,8 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
 
     try {
       const canvas = new fabric.Canvas(canvasRef.current, {
-        width,
-        height,
+        width: canvasDimensions.width,
+        height: canvasDimensions.height,
         backgroundColor: '#ffffff',
         selection: true,
         preserveObjectStacking: true,
@@ -508,7 +569,7 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
     } catch (error) {
       console.error('❌ [SimpleTextCanvas] Error creating canvas:', error);
     }
-  }, [width, height, dispatch, slideId]);
+  }, [canvasDimensions.width, canvasDimensions.height, dispatch, slideId]);
 
   // Load slide elements into canvas
   useEffect(() => {
@@ -639,15 +700,33 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
           return;
         }
 
-        // Calculate scale factors to match the stored size
-        const scaleX = element.size.width / (img.width || 1);
-        const scaleY = element.size.height / (img.height || 1);
+        // Calculate scale to maintain aspect ratio
+        const imageAspectRatio = (img.width || 1) / (img.height || 1);
+        const targetAspectRatio = element.size.width / element.size.height;
+        
+        let scaleX, scaleY;
+        
+        if (Math.abs(imageAspectRatio - targetAspectRatio) < 0.01) {
+          // Aspect ratios are very similar, scale normally
+          scaleX = element.size.width / (img.width || 1);
+          scaleY = element.size.height / (img.height || 1);
+        } else {
+          // Maintain aspect ratio by using uniform scaling
+          const scaleToFitWidth = element.size.width / (img.width || 1);
+          const scaleToFitHeight = element.size.height / (img.height || 1);
+          const uniformScale = Math.min(scaleToFitWidth, scaleToFitHeight);
+          scaleX = uniformScale;
+          scaleY = uniformScale;
+        }
 
         console.log('🖼️ [SimpleTextCanvas] Image scaling calculation:', {
           elementId: element.id,
           originalImageSize: { width: img.width, height: img.height },
           targetSize: element.size,
-          calculatedScale: { scaleX, scaleY }
+          imageAspectRatio: imageAspectRatio.toFixed(3),
+          targetAspectRatio: targetAspectRatio.toFixed(3),
+          calculatedScale: { scaleX: scaleX.toFixed(3), scaleY: scaleY.toFixed(3) },
+          maintainedAspectRatio: Math.abs(scaleX - scaleY) < 0.01
         });
 
         img.set({
@@ -800,25 +879,53 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
     reader.onload = (e) => {
       const imageUrl = e.target?.result as string;
 
-      // Create new image element data
-      const newElement: Omit<SlideElement, 'id' | 'createdAt' | 'updatedAt'> = {
-        type: 'image',
-        position: { x: 100, y: 100 },
-        size: { width: 200, height: 150 },
-        properties: {
-          opacity: 1,
-        },
-        content: imageUrl, // Store the base64 image data
+      // Create a temporary image to get dimensions
+      const tempImg = new Image();
+      tempImg.onload = () => {
+        // Calculate size maintaining aspect ratio
+        const maxWidth = 300;
+        const maxHeight = 200;
+        const imageAspectRatio = tempImg.width / tempImg.height;
+        
+        let width, height;
+        if (imageAspectRatio > maxWidth / maxHeight) {
+          // Image is wider - constrain by width
+          width = maxWidth;
+          height = maxWidth / imageAspectRatio;
+        } else {
+          // Image is taller - constrain by height
+          height = maxHeight;
+          width = maxHeight * imageAspectRatio;
+        }
+
+        console.log('🖼️ [SimpleTextCanvas] Image dimensions calculated:', {
+          originalSize: { width: tempImg.width, height: tempImg.height },
+          aspectRatio: imageAspectRatio.toFixed(3),
+          calculatedSize: { width: width.toFixed(1), height: height.toFixed(1) }
+        });
+
+        // Create new image element data with proper aspect ratio
+        const newElement: Omit<SlideElement, 'id' | 'createdAt' | 'updatedAt'> = {
+          type: 'image',
+          position: { x: 100, y: 100 },
+          size: { width: Math.round(width), height: Math.round(height) },
+          properties: {
+            opacity: 1,
+          },
+          content: imageUrl, // Store the base64 image data
+        };
+
+        console.log('🖼️ [SimpleTextCanvas] Creating new image element with aspect ratio');
+
+        try {
+          dispatch(addElement({ slideId, element: newElement }));
+          console.log('✅ [SimpleTextCanvas] Image element dispatched to Redux');
+        } catch (error) {
+          console.error('❌ [SimpleTextCanvas] Error dispatching image element:', error);
+        }
       };
-
-      console.log('🖼️ [SimpleTextCanvas] Creating new image element');
-
-      try {
-        dispatch(addElement({ slideId, element: newElement }));
-        console.log('✅ [SimpleTextCanvas] Image element dispatched to Redux');
-      } catch (error) {
-        console.error('❌ [SimpleTextCanvas] Error dispatching image element:', error);
-      }
+      
+      tempImg.src = imageUrl;
     };
 
     reader.readAsDataURL(file);
@@ -1033,20 +1140,28 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
   console.log('🔥 [SimpleTextCanvas] ===== RENDERING COMPONENT =====');
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div ref={containerRef} style={{ 
+      padding: '20px', 
+      height: '100%', 
+      display: 'flex', 
+      flexDirection: 'column',
+      overflow: 'hidden'
+    }}>
       <div style={{
         marginBottom: '10px',
         padding: '10px',
         backgroundColor: '#f8f9fa',
         borderRadius: '4px',
-        textAlign: 'center'
+        textAlign: 'center',
+        flexShrink: 0
       }}>
         <strong>SimpleTextCanvas with Formatting</strong> - Add text elements and format them
         <br />
         <small>
           Canvas Ready: {isCanvasReady ? '✅' : '❌'} |
           Elements: {currentSlide?.elements?.length || 0} |
-          Selected: {selectedObject?.type || 'none'}
+          Selected: {selectedObject?.type || 'none'} |
+          Size: {canvasDimensions.width}×{canvasDimensions.height}
         </small>
       </div>
 
@@ -1392,24 +1507,34 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
       )}
 
       <div style={{
-        border: '2px solid #007bff',
-        borderRadius: '4px',
-        backgroundColor: '#ffffff',
-        display: 'inline-block'
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        minHeight: 0
       }}>
-        <canvas
-          ref={canvasRef}
-          width={width}
-          height={height}
-          style={{
-            display: 'block',
-            outline: 'none' // Remove focus outline for cleaner look
-          }}
-          tabIndex={0}
-          title="Click to focus, drag images here, or use Delete/Backspace to delete selected elements"
-          onDrop={handleCanvasDrop}
-          onDragOver={handleCanvasDragOver}
-        />
+        <div style={{
+          border: '2px solid #007bff',
+          borderRadius: '4px',
+          backgroundColor: '#ffffff',
+          display: 'inline-block',
+          boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+        }}>
+          <canvas
+            ref={canvasRef}
+            width={canvasDimensions.width}
+            height={canvasDimensions.height}
+            style={{
+              display: 'block',
+              outline: 'none' // Remove focus outline for cleaner look
+            }}
+            tabIndex={0}
+            title="Click to focus, drag images here, or use Delete/Backspace to delete selected elements"
+            onDrop={handleCanvasDrop}
+            onDragOver={handleCanvasDragOver}
+          />
+        </div>
       </div>
 
       <div style={{
