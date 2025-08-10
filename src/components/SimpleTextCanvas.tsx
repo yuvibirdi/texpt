@@ -57,23 +57,28 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
       const PDF_HEIGHT_CM = 7.3;
       const PDF_ASPECT_RATIO = PDF_WIDTH_CM / PDF_HEIGHT_CM; // ~2.096
       
-      // Calculate canvas pixel dimensions that match PDF aspect ratio EXACTLY
+      // Calculate canvas pixel dimensions that maintain EXACT 1:1 PDF coordinate mapping
+      // This ensures that every pixel on the canvas corresponds exactly to the PDF output
       let canvasWidth, canvasHeight;
       
-      // Always maintain exact PDF aspect ratio
+      // Calculate ideal canvas size for perfect PDF mapping (larger size = better precision)
+      const IDEAL_CANVAS_WIDTH = 800; // Base size for good resolution
+      const IDEAL_CANVAS_HEIGHT = IDEAL_CANVAS_WIDTH / PDF_ASPECT_RATIO;
+      
+      // Scale to fit available space while maintaining exact PDF aspect ratio and mapping
       const containerAspectRatio = availableWidth / availableHeight;
       
       if (containerAspectRatio > PDF_ASPECT_RATIO) {
-        // Container is wider than PDF ratio - constrain by height
-        canvasHeight = Math.min(availableHeight, 400); // Max height for usability
+        // Container is wider than PDF ratio - constrain by height to maintain PDF mapping
+        canvasHeight = Math.min(availableHeight, IDEAL_CANVAS_HEIGHT);
         canvasWidth = canvasHeight * PDF_ASPECT_RATIO;
       } else {
-        // Container is taller than PDF ratio - constrain by width  
-        canvasWidth = Math.min(availableWidth, 800); // Max width for usability
+        // Container is taller than PDF ratio - constrain by width to maintain PDF mapping
+        canvasWidth = Math.min(availableWidth, IDEAL_CANVAS_WIDTH);
         canvasHeight = canvasWidth / PDF_ASPECT_RATIO;
       }
       
-      // Ensure minimum usable size
+      // Ensure minimum usable size for PDF coordinate precision
       const MIN_WIDTH = 400;
       const MIN_HEIGHT = MIN_WIDTH / PDF_ASPECT_RATIO;
       
