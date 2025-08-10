@@ -317,7 +317,7 @@ export class LaTeXGenerator {
 
     if (properties.fontSize) {
       // Scale font size based on coordinate conversion ratio
-      // Canvas reference: 800x600, LaTeX usable: 15.3cm x 7.3cm
+      // Canvas reference: 800x382, LaTeX usable: 15.3cm x 7.3cm
       const CANVAS_WIDTH = 800;
       const USABLE_WIDTH_CM = 15.3;
       const SCALE_FACTOR = USABLE_WIDTH_CM / CANVAS_WIDTH; // ~0.019125
@@ -592,9 +592,9 @@ export class LaTeXGenerator {
    * Correct coordinate conversion with proper margins for text positioning
    */
   private convertCanvasToLatexCoordinates(position: { x: number; y: number }, size: { width: number; height: number }) {
-    // Canvas dimensions
-    const CANVAS_WIDTH = 1600;
-    const CANVAS_HEIGHT = 900;
+    // Canvas dimensions - must match SimpleTextCanvas.tsx BASE dimensions
+    const CANVAS_WIDTH = 800;  // Must match BASE_WIDTH in SimpleTextCanvas.tsx
+    const CANVAS_HEIGHT = Math.round(800 * (7.3 / 15.3)); // Must match calculated BASE_HEIGHT
 
     // Absolute slide boundaries:
     // Left edge: 0.2cm, Right edge: 15.5cm
@@ -611,7 +611,7 @@ export class LaTeXGenerator {
 
     // Scale factors based on full usable area
     const X_SCALE = USABLE_WIDTH_CM / CANVAS_WIDTH;   // 15.3 / 800 = 0.019125
-    const Y_SCALE = USABLE_HEIGHT_CM / CANVAS_HEIGHT; // 7.3 / 450 = 0.016222
+    const Y_SCALE = USABLE_HEIGHT_CM / CANVAS_HEIGHT; // 7.3 / 382 = 0.019110
 
     // Convert coordinates using the full usable area
     const x = SLIDE_LEFT_EDGE + (position.x * X_SCALE);

@@ -16,7 +16,7 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
   console.log('🔥 [SimpleTextCanvas] Props:', { slideId });
 
   // State for responsive canvas dimensions
-  const [canvasDimensions, setCanvasDimensions] = useState({ width: 800, height: 600 });
+  const [canvasDimensions, setCanvasDimensions] = useState({ width: 800, height: 600});
   const containerRef = useRef<HTMLDivElement>(null);
 
   const dispatch = useDispatch();
@@ -27,7 +27,7 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   const [fontSizeInput, setFontSizeInput] = useState<string>('16');
   const [currentTextColor, setCurrentTextColor] = useState<string>('#000000');
-  const [showOutOfBoundsWarning] = useState<boolean>(false);
+  const [showOutOfBoundsWarning, setShowOutOfBoundsWarning] = useState<boolean>(false);
   const fontSizeDebounceRef = useRef<NodeJS.Timeout | null>(null);
 
   // Get current slide data from Redux store
@@ -40,7 +40,7 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
     slideElementsCount: currentSlide?.elements?.length || 0
   });
 
-  // Calculate responsive canvas dimensions
+  // Calculate canvas dimensions to EXACTLY match PDF page dimensions
   useEffect(() => {
     const calculateCanvasSize = () => {
       if (!containerRef.current) return;
@@ -52,28 +52,49 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
       const availableWidth = containerRect.width - 40; // 20px padding on each side
       const availableHeight = containerRect.height - 200; // Space for toolbars and padding
       
-      // Canvas dimensions that exactly match PDF page (1:1)
-      // PDF usable area: 15.3cm x 7.3cm
-      // Use a base size that matches this ratio exactly
-      const BASE_WIDTH = 800;  // Base canvas width
-      const BASE_HEIGHT = Math.round(BASE_WIDTH * (7.3 / 15.3)); // ~382px to match PDF ratio
+      // EXACT PDF DIMENSIONS - LaTeX usable area: 15.3cm x 7.3cm
+      const PDF_WIDTH_CM = 15.3;
+      const PDF_HEIGHT_CM = 7.3;
+      const PDF_ASPECT_RATIO = PDF_WIDTH_CM / PDF_HEIGHT_CM; // ~2.096
       
-      // Calculate scale factor to fit available space
-      const scaleX = availableWidth / BASE_WIDTH;
-      const scaleY = availableHeight / BASE_HEIGHT;
-      const scale = Math.min(scaleX, scaleY, 2.5); // Max 2.5x zoom
+      // Calculate canvas pixel dimensions that match PDF aspect ratio EXACTLY
+      let canvasWidth, canvasHeight;
       
-      // Apply scale but keep exact PDF proportions
-      const canvasWidth = BASE_WIDTH * Math.max(scale, 0.5); // Min 0.5x scale
-      const canvasHeight = BASE_HEIGHT * Math.max(scale, 0.5);
+      // Always maintain exact PDF aspect ratio
+      const containerAspectRatio = availableWidth / availableHeight;
       
-      console.log('📐 [SimpleTextCanvas] Canvas size calculation:', {
+      if (containerAspectRatio > PDF_ASPECT_RATIO) {
+        // Container is wider than PDF ratio - constrain by height
+        canvasHeight = Math.min(availableHeight, 400); // Max height for usability
+        canvasWidth = canvasHeight * PDF_ASPECT_RATIO;
+      } else {
+        // Container is taller than PDF ratio - constrain by width  
+        canvasWidth = Math.min(availableWidth, 800); // Max width for usability
+        canvasHeight = canvasWidth / PDF_ASPECT_RATIO;
+      }
+      
+      // Ensure minimum usable size
+      const MIN_WIDTH = 400;
+      const MIN_HEIGHT = MIN_WIDTH / PDF_ASPECT_RATIO;
+      
+      if (canvasWidth < MIN_WIDTH) {
+        canvasWidth = MIN_WIDTH;
+        canvasHeight = MIN_HEIGHT;
+      }
+      
+      console.log('📐 [PDF-Matched Canvas] Canvas size calculation:', {
         containerSize: { width: containerRect.width, height: containerRect.height },
         availableSpace: { width: availableWidth, height: availableHeight },
-        baseSize: { width: BASE_WIDTH, height: BASE_HEIGHT },
-        scale: scale.toFixed(2),
-        finalSize: { width: canvasWidth, height: canvasHeight },
-        aspectRatio: (canvasWidth / canvasHeight).toFixed(3)
+        pdfDimensions: { width: PDF_WIDTH_CM, height: PDF_HEIGHT_CM },
+        pdfAspectRatio: PDF_ASPECT_RATIO.toFixed(3),
+        containerAspectRatio: containerAspectRatio.toFixed(3),
+        finalCanvasSize: { width: Math.round(canvasWidth), height: Math.round(canvasHeight) },
+        finalAspectRatio: (canvasWidth / canvasHeight).toFixed(3),
+        aspectRatioMatch: Math.abs((canvasWidth / canvasHeight) - PDF_ASPECT_RATIO) < 0.001,
+        pixelsPerCm: {
+          width: canvasWidth / PDF_WIDTH_CM,
+          height: canvasHeight / PDF_HEIGHT_CM
+        }
       });
       
       setCanvasDimensions({ width: Math.round(canvasWidth), height: Math.round(canvasHeight) });
@@ -124,7 +145,126 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
       fabricCanvasRef.current = canvas;
       setIsCanvasReady(true);
 
-      // Canvas bounds constraint temporarily disabled to debug scaling issues
+      // Helper functions for PDF bounds checking (defined inside useEffect to avoid dependency issues)
+      const convertCanvasToPdfCoords = (canvasX: number, canvasY: number, canvasWidth: number, canvasHeight: number) => {
+        // PDF usable area: 15.3cm x 7.3cm with margins
+        const PDF_WIDTH_CM = 15.3;
+        const PDF_HEIGHT_CM = 7.3;
+        const MARGIN_CM = 0.3; // 0.3cm margin from edges
+        
+        const USABLE_PDF_WIDTH = PDF_WIDTH_CM - (2 * MARGIN_CM); // 14.7cm
+        const USABLE_PDF_HEIGHT = PDF_HEIGHT_CM - (2 * MARGIN_CM); // 6.7cm
+        
+        // Convert canvas pixels to PDF cm
+        const pdfX = (canvasX / canvasWidth) * USABLE_PDF_WIDTH;
+        const pdfY = (canvasY / canvasHeight) * USABLE_PDF_HEIGHT;
+        
+        return { 
+          pdfX, 
+          pdfY, 
+          USABLE_PDF_WIDTH, 
+          USABLE_PDF_HEIGHT,
+          MARGIN_CM
+        };
+      };
+
+      const isWithinPdfBounds = (obj: fabric.Object, canvas: fabric.Canvas) => {
+        if (!obj || !obj.left || !obj.top) return false;
+        
+        const canvasWidth = canvas.getWidth();
+        const canvasHeight = canvas.getHeight();
+        const objLeft = obj.left;
+        const objTop = obj.top;
+        const objWidth = obj.getScaledWidth();
+        const objHeight = obj.getScaledHeight();
+        
+        const coords = convertCanvasToPdfCoords(objLeft, objTop, canvasWidth, canvasHeight);
+        const objBottomRight = convertCanvasToPdfCoords(objLeft + objWidth, objTop + objHeight, canvasWidth, canvasHeight);
+        
+        const withinBounds = coords.pdfX >= 0 && 
+                            coords.pdfY >= 0 && 
+                            objBottomRight.pdfX <= coords.USABLE_PDF_WIDTH && 
+                            objBottomRight.pdfY <= coords.USABLE_PDF_HEIGHT;
+        
+        console.log('🔍 [PDF Bounds Check]', {
+          objectType: obj.type,
+          canvasPos: { x: objLeft, y: objTop, width: objWidth, height: objHeight },
+          pdfPos: { x: coords.pdfX.toFixed(2), y: coords.pdfY.toFixed(2) },
+          pdfBottomRight: { x: objBottomRight.pdfX.toFixed(2), y: objBottomRight.pdfY.toFixed(2) },
+          pdfLimits: { width: coords.USABLE_PDF_WIDTH, height: coords.USABLE_PDF_HEIGHT },
+          withinBounds
+        });
+        
+        return withinBounds;
+      };
+
+      const constrainToPdfBounds = (obj: fabric.Object, canvas: fabric.Canvas) => {
+        if (!obj || !obj.left || !obj.top) return;
+        
+        const canvasWidth = canvas.getWidth();
+        const canvasHeight = canvas.getHeight();
+        const objWidth = obj.getScaledWidth();
+        const objHeight = obj.getScaledHeight();
+        
+        // Convert PDF limits back to canvas coordinates
+        const coords = convertCanvasToPdfCoords(0, 0, canvasWidth, canvasHeight);
+        
+        // Calculate max positions in canvas pixels
+        const maxCanvasX = (coords.USABLE_PDF_WIDTH / coords.USABLE_PDF_WIDTH) * canvasWidth - objWidth;
+        const maxCanvasY = (coords.USABLE_PDF_HEIGHT / coords.USABLE_PDF_HEIGHT) * canvasHeight - objHeight;
+        
+        let constrainedX = Math.max(0, Math.min(obj.left, maxCanvasX));
+        let constrainedY = Math.max(0, Math.min(obj.top, maxCanvasY));
+        
+        if (constrainedX !== obj.left || constrainedY !== obj.top) {
+          console.log('🔒 [PDF Bounds Constraint] Object constrained to PDF bounds:', {
+            original: { x: obj.left, y: obj.top },
+            constrained: { x: constrainedX, y: constrainedY }
+          });
+          
+          obj.set({
+            left: constrainedX,
+            top: constrainedY
+          });
+          
+          return true; // Object was constrained
+        }
+        
+        return false; // No constraint needed
+      };
+
+      const checkOutOfBoundsWarning = (canvas: fabric.Canvas) => {
+        const PDF_EDGE_THRESHOLD_CM = 0.5; // Show warning if within 0.5cm of PDF edge
+        let hasNearEdgeObjects = false;
+        
+        canvas.forEachObject((obj) => {
+          if (!isWithinPdfBounds(obj, canvas)) {
+            hasNearEdgeObjects = true;
+            return;
+          }
+          
+          // Check if object is close to PDF edges
+          const canvasWidth = canvas.getWidth();
+          const canvasHeight = canvas.getHeight();
+          const objLeft = obj.left || 0;
+          const objTop = obj.top || 0;
+          const objWidth = obj.getScaledWidth();
+          const objHeight = obj.getScaledHeight();
+          
+          const coords = convertCanvasToPdfCoords(objLeft, objTop, canvasWidth, canvasHeight);
+          const objBottomRight = convertCanvasToPdfCoords(objLeft + objWidth, objTop + objHeight, canvasWidth, canvasHeight);
+          
+          // Check if close to any PDF edge
+          if (coords.pdfX < PDF_EDGE_THRESHOLD_CM || 
+              coords.pdfY < PDF_EDGE_THRESHOLD_CM ||
+              objBottomRight.pdfX > (coords.USABLE_PDF_WIDTH - PDF_EDGE_THRESHOLD_CM) ||
+              objBottomRight.pdfY > (coords.USABLE_PDF_HEIGHT - PDF_EDGE_THRESHOLD_CM)) {
+            hasNearEdgeObjects = true;
+          }
+        });
+        
+        setShowOutOfBoundsWarning(hasNearEdgeObjects);
+      };
 
       // Selection event handlers for formatting
       canvas.on('selection:created', (e) => {
@@ -225,7 +365,7 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
         }
       });
 
-      // Combined scaling handler for both textboxes and images
+      // Combined scaling handler with PDF bounds constraints
       canvas.on('object:scaling', (e) => {
         const obj = e.target;
         if (!obj) return;
@@ -254,36 +394,44 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
           });
         }
 
-        // TEMPORARILY DISABLED: Handle canvas bounds constraint for all objects
-        // const canvasWidth = canvas.getWidth();
-        // const canvasHeight = canvas.getHeight();
+        // PDF BOUNDS CONSTRAINT: Prevent scaling beyond PDF page limits
+        const canvasWidth = canvas.getWidth();
+        const canvasHeight = canvas.getHeight();
+        const objLeft = obj.left || 0;
+        const objTop = obj.top || 0;
+        const objScaledWidth = obj.getScaledWidth();
+        const objScaledHeight = obj.getScaledHeight();
 
-        // // Get object bounds with current scaling
-        // const objWidth = obj.getScaledWidth();
-        // const objHeight = obj.getScaledHeight();
+        // Check if scaled object would exceed PDF bounds
+        const coords = convertCanvasToPdfCoords(objLeft, objTop, canvasWidth, canvasHeight);
+        const scaledBottomRight = convertCanvasToPdfCoords(objLeft + objScaledWidth, objTop + objScaledHeight, canvasWidth, canvasHeight);
 
-        // // Prevent scaling beyond canvas bounds
-        // let needsConstraint = false;
+        let needsConstraint = false;
 
-        // if (obj.left! + objWidth > canvasWidth) {
-        //   const maxScaleX = (canvasWidth - obj.left!) / (obj.width || 1);
-        //   if (obj.scaleX! > maxScaleX) {
-        //     obj.set('scaleX', maxScaleX);
-        //     needsConstraint = true;
-        //   }
-        // }
+        // Constrain scaling to stay within PDF usable area
+        if (scaledBottomRight.pdfX > coords.USABLE_PDF_WIDTH) {
+          const maxPdfWidth = coords.USABLE_PDF_WIDTH - coords.pdfX;
+          const maxCanvasWidth = (maxPdfWidth / coords.USABLE_PDF_WIDTH) * canvasWidth;
+          const maxScaleX = maxCanvasWidth / (obj.width || 1);
+          if (obj.scaleX! > maxScaleX) {
+            obj.set('scaleX', Math.max(0.1, maxScaleX));
+            needsConstraint = true;
+          }
+        }
 
-        // if (obj.top! + objHeight > canvasHeight) {
-        //   const maxScaleY = (canvasHeight - obj.top!) / (obj.height || 1);
-        //   if (obj.scaleY! > maxScaleY) {
-        //     obj.set('scaleY', maxScaleY);
-        //     needsConstraint = true;
-        //   }
-        // }
+        if (scaledBottomRight.pdfY > coords.USABLE_PDF_HEIGHT) {
+          const maxPdfHeight = coords.USABLE_PDF_HEIGHT - coords.pdfY;
+          const maxCanvasHeight = (maxPdfHeight / coords.USABLE_PDF_HEIGHT) * canvasHeight;
+          const maxScaleY = maxCanvasHeight / (obj.height || 1);
+          if (obj.scaleY! > maxScaleY) {
+            obj.set('scaleY', Math.max(0.1, maxScaleY));
+            needsConstraint = true;
+          }
+        }
 
-        // if (needsConstraint) {
-        //   console.log('🔒 [SimpleTextCanvas] Object scaling constrained to canvas bounds');
-        // }
+        if (needsConstraint) {
+          console.log('🔒 [PDF Bounds] Object scaling constrained to PDF page limits');
+        }
       });
 
       canvas.on('object:scaled', (e) => {
@@ -309,6 +457,9 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
           }));
 
           console.log('✅ [SimpleTextCanvas] Textbox size updated in Redux');
+          
+          // Check for out of bounds warning after scaling
+          checkOutOfBoundsWarning(canvas);
         } else if (obj && obj.type === 'image' && obj.data?.elementId) {
           console.log('🖼️ [SimpleTextCanvas] ===== IMAGE SCALED COMPLETE =====');
           const image = obj as fabric.Image;
@@ -341,6 +492,9 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
           }));
 
           console.log('✅ [SimpleTextCanvas] Image size updated in Redux');
+          
+          // Check for out of bounds warning after image scaling
+          checkOutOfBoundsWarning(canvas);
         } else {
           console.log('⚠️ [SimpleTextCanvas] Object scaled but no Redux update:', {
             type: obj?.type,
@@ -350,22 +504,87 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
         }
       });
 
-      // Handle object movement to update Redux
+      // Add real-time PDF bounds constraint during movement
+      canvas.on('object:moving', (e) => {
+        const obj = e.target;
+        if (!obj) return;
+
+        const canvasWidth = canvas.getWidth();
+        const canvasHeight = canvas.getHeight();
+        const objWidth = obj.getScaledWidth();
+        const objHeight = obj.getScaledHeight();
+        const objLeft = obj.left || 0;
+        const objTop = obj.top || 0;
+
+        // Convert to PDF coordinates to check bounds
+        const coords = convertCanvasToPdfCoords(objLeft, objTop, canvasWidth, canvasHeight);
+        const objBottomRight = convertCanvasToPdfCoords(objLeft + objWidth, objTop + objHeight, canvasWidth, canvasHeight);
+
+        let constrainedLeft = objLeft;
+        let constrainedTop = objTop;
+
+        // Constrain to PDF usable area (not just canvas edges)
+        // Left edge: must be >= 0 in PDF coordinates
+        if (coords.pdfX < 0) {
+          constrainedLeft = 0;
+        }
+
+        // Top edge: must be >= 0 in PDF coordinates
+        if (coords.pdfY < 0) {
+          constrainedTop = 0;
+        }
+
+        // Right edge: object right edge must not exceed PDF usable width
+        if (objBottomRight.pdfX > coords.USABLE_PDF_WIDTH) {
+          const maxPdfX = coords.USABLE_PDF_WIDTH - ((objWidth / canvasWidth) * coords.USABLE_PDF_WIDTH);
+          constrainedLeft = (maxPdfX / coords.USABLE_PDF_WIDTH) * canvasWidth;
+        }
+
+        // Bottom edge: object bottom edge must not exceed PDF usable height
+        if (objBottomRight.pdfY > coords.USABLE_PDF_HEIGHT) {
+          const maxPdfY = coords.USABLE_PDF_HEIGHT - ((objHeight / canvasHeight) * coords.USABLE_PDF_HEIGHT);
+          constrainedTop = (maxPdfY / coords.USABLE_PDF_HEIGHT) * canvasHeight;
+        }
+
+        // Apply PDF-based constraints in real-time
+        if (constrainedLeft !== objLeft || constrainedTop !== objTop) {
+          obj.set({
+            left: constrainedLeft,
+            top: constrainedTop
+          });
+        }
+      });
+
+      // Handle object movement with PDF bounds constraint
       canvas.on('object:moved', (e) => {
         const obj = e.target;
         if (obj && obj.data?.elementId) {
           console.log('🔄 [SimpleTextCanvas] ===== OBJECT MOVED =====');
           console.log('🔄 [SimpleTextCanvas] Object type:', obj.type, 'New position:', { x: obj.left, y: obj.top });
 
+          // PDF BOUNDS CONSTRAINT: Ensure final position stays within PDF page limits
+          const wasConstrained = constrainToPdfBounds(obj, canvas);
+          
+          if (wasConstrained) {
+            canvas.renderAll();
+          }
+
+          // Always use the (potentially constrained) position for Redux
+          const finalLeft = obj.left || 0;
+          const finalTop = obj.top || 0;
+
           dispatch(updateElement({
             slideId,
             elementId: obj.data.elementId,
             updates: {
-              position: { x: obj.left || 0, y: obj.top || 0 }
+              position: { x: finalLeft, y: finalTop }
             }
           }));
 
           console.log('✅ [SimpleTextCanvas] Object position updated in Redux');
+          
+          // Check for PDF bounds warning after movement
+          checkOutOfBoundsWarning(canvas);
         } else {
           console.log('⚠️ [SimpleTextCanvas] Object moved but no Redux update:', {
             type: obj?.type,
@@ -1519,7 +1738,9 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
           borderRadius: '4px',
           backgroundColor: '#ffffff',
           display: 'inline-block',
-          boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+          boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+          maxWidth: '100%',    // CRITICAL: Container can't exceed parent width
+          overflow: 'hidden'   // CRITICAL: Hide any overflow
         }}>
           <canvas
             ref={canvasRef}
@@ -1527,7 +1748,10 @@ const SimpleTextCanvas: React.FC<SimpleTextCanvasProps> = ({
             height={canvasDimensions.height}
             style={{
               display: 'block',
-              outline: 'none' // Remove focus outline for cleaner look
+              outline: 'none', // Remove focus outline for cleaner look
+              maxWidth: '100%', // CRITICAL: Prevent canvas from exceeding container width
+              height: 'auto',   // CRITICAL: Maintain aspect ratio when scaling down
+              objectFit: 'contain' // CRITICAL: Scale content properly
             }}
             tabIndex={0}
             title="Click to focus, drag images here, or use Delete/Backspace to delete selected elements"
