@@ -593,8 +593,8 @@ export class LaTeXGenerator {
    */
   private convertCanvasToLatexCoordinates(position: { x: number; y: number }, size: { width: number; height: number }) {
     // Canvas dimensions
-    const CANVAS_WIDTH = 800;
-    const CANVAS_HEIGHT = 600;
+    const CANVAS_WIDTH = 1600;
+    const CANVAS_HEIGHT = 900;
 
     // Absolute slide boundaries:
     // Left edge: 0.2cm, Right edge: 15.5cm
@@ -611,7 +611,7 @@ export class LaTeXGenerator {
 
     // Scale factors based on full usable area
     const X_SCALE = USABLE_WIDTH_CM / CANVAS_WIDTH;   // 15.3 / 800 = 0.019125
-    const Y_SCALE = USABLE_HEIGHT_CM / CANVAS_HEIGHT; // 7.3 / 600 = 0.012167
+    const Y_SCALE = USABLE_HEIGHT_CM / CANVAS_HEIGHT; // 7.3 / 450 = 0.016222
 
     // Convert coordinates using the full usable area
     const x = SLIDE_LEFT_EDGE + (position.x * X_SCALE);
