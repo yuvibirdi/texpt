@@ -1,23 +1,17 @@
 # LaTeX Presentation Editor
-
+<!--
 A presentation editor that combines visual editing with LaTeX rendering, built with Electron, React, and TypeScript.
 
 ## Features
-
 - Visual presentation editing interface
 - LaTeX rendering for mathematical expressions and formatting
 - Cross-platform desktop application (Windows, macOS, Linux)
 - Modern React-based UI with TypeScript support
 - Integrated development environment with hot reload
+-->
 
-## Development Setup
 
-### Prerequisites
-
-- Node.js (v16 or higher)
-- npm or yarn package manager
-
-### Installation
+## Installation
 
 1. Clone the repository
 2. Install dependencies:
@@ -38,22 +32,6 @@ A presentation editor that combines visual editing with LaTeX rendering, built w
 - `npm start` - Build and start production version
 - `npm run dist` - Create distributable packages
 
-### Project Structure
-
-```
-├── electron/           # Electron main process files
-│   ├── main.ts        # Main Electron process
-│   ├── preload.ts     # Preload script for secure IPC
-│   └── tsconfig.json  # TypeScript config for Electron
-├── src/               # React application source
-│   ├── App.tsx        # Main React component
-│   ├── index.tsx      # React entry point
-│   └── ...
-├── public/            # Static assets
-├── build/             # Built application (generated)
-└── dist/              # Distribution packages (generated)
-```
-
 ### Development Workflow
 
 1. Start the development environment:
@@ -66,7 +44,7 @@ A presentation editor that combines visual editing with LaTeX rendering, built w
 3. Electron will automatically load the React app and open the desktop application
 4. Changes to React components will hot-reload automatically
 5. Changes to Electron main process require restarting the Electron app
-
+<!--
 ### Building for Production
 
 1. Build the application:
@@ -99,16 +77,7 @@ npm run test:watch
 - **Canvas Library**: Fabric.js for visual editing
 - **Build Tool**: React Scripts with custom Electron integration
 - **Testing**: Jest with React Testing Library
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Ensure all tests pass
-6. Submit a pull request
-
+-->
 ## License
 
 This project is licensed under the MIT License.
